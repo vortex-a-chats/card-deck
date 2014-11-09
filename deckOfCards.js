@@ -24,6 +24,7 @@ function Card(config) {
 function Deck() {
     // cards of the game
     this.cards = new Array();
+    this.hasDistributed = 0;
 
     // place where the dead card goes
     this.graveyard = new Array();
@@ -31,9 +32,9 @@ function Deck() {
     this.health = function () {
         var blah = "i am a deck having " + this.cards.length + " cards.";
         for (i = 0; i < this.cards.length; i++) {
-             blah += "<br/>"+this.cards[i].name;
+            blah += "<br/>" + this.cards[i].name;
         }
-       
+
         return blah;
     };
     // shuffle the deck
@@ -46,17 +47,31 @@ function Deck() {
     };
     // distribute a certain number of cards to one player
     this.distribute = function (player, int) {
-
+        var oneCard = this.cards.pop();
+        player.cards.push(oneCard);
+        this.hasDistributed = 1;
+        return true;
     };
     // distribute an equal number of cards to all the players
     this.distributeAll = function (players, int) {
+        for (i = 0; i < players.length; i++) {
+            if (typeof (players[i]) !== undefined) {
 
+                for (j = 0; j < int; j++) {
+                    var oneCard = this.cards.pop();
+                    players[i].cards.push(oneCard);
+                }
+            }
+
+        }
+        this.hasDistributed = 1;
+        return true;
     };
     // remove one card 
     this.out = function (card) {
-       var cardid=12;
-       var exitedCard = this.cards.pop(cardid);
-       this.graveyard.push(exitedCard);
+        var cardid = 12;
+        var exitedCard = this.cards.pop(cardid);
+        this.graveyard.push(exitedCard);
     };
     // remove one card 
     this.in = function (card) {
@@ -95,7 +110,7 @@ function Player(config) {
     this.cards = new Array();
     this.score = '';
     this.turnId = '';
-    this.status = function(){
+    this.status = function () {
         return "player " + this.id + ") " + this.name + ". having " + this.cards.length + "cards";
     };
     for (var attrname in config) {
