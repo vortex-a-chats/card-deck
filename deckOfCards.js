@@ -90,14 +90,13 @@ function Deck() {
  */
 function Player(config) {
 
-
     this.id = 0;
     this.name = '';
     this.cards = new Array();
     this.score = '';
     this.turnId = '';
     this.status = function(){
-        return "player " + this.id + ") " + this.name + ". having " + this.cards.length . "cards";
+        return "player " + this.id + ") " + this.name + ". having " + this.cards.length + "cards";
     };
     for (var attrname in config) {
         this[attrname] = config[attrname];
