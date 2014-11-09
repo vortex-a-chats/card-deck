@@ -25,10 +25,6 @@ function Deck() {
     // cards of the game
     this.cards = new Array();
 
-
-
-
-
     // place where the dead card goes
     this.graveyard = new Array();
     // tells how the deck is.
@@ -58,7 +54,9 @@ function Deck() {
     };
     // remove one card 
     this.out = function (card) {
-
+       var cardid=12;
+       var exitedCard = this.cards.pop(cardid);
+       this.graveyard.push(exitedCard);
     };
     // remove one card 
     this.in = function (card) {
@@ -81,7 +79,6 @@ function Deck() {
                 points: j,
             }
             count++;
-//            this.cards.push(new Card(config))
             this.in(new Card(config));
         }
     }
@@ -91,9 +88,21 @@ function Deck() {
  * card player
  * @returns {undefined}
  */
-function Player() {
+function Player(config) {
 
+
+    this.id = 0;
+    this.name = '';
+    this.cards = new Array();
+    this.score = '';
+    this.turnId = '';
+    this.status = function(){
+        return "player " + this.id + ") " + this.name + ". having " + this.cards.length . "cards";
+    };
+    for (var attrname in config) {
+        this[attrname] = config[attrname];
+    }
+
+    return this;
 }
-
-
 
