@@ -108,8 +108,15 @@ function Player(config) {
     this.id = 0;
     this.name = '';
     this.cards = new Array();
+    this.stash = ''; // a place to store cards that wont be used
     this.score = '';
     this.turnId = '';
+    this.hasCards = function(){
+        if( this.cards.length > 0 ){
+            return true;
+        }
+        return false;
+    };
     this.status = function () {
         return "player " + this.id + ") " + this.name + ". having " + this.cards.length + "cards";
     };
@@ -120,3 +127,34 @@ function Player(config) {
     return this;
 }
 
+/**
+ * core of the action in a game,
+ * the dealer runs the turns
+ * @returns {undefined}
+ */
+function Dealer(players){
+    
+    this.players = players;
+    this.maxTurns = 10;
+    this.playerToStart = 0;
+    this.playerActive = 0;
+    this.table = new Array(); // place where cards are shown to everyone
+    // run all the turns
+    this.play = function(){
+        console.log(players);
+        for (i = 0; i < this.maxTurns; i++) {
+            var log = "<br>Turn "+i +") ";
+            // set who's turn it is to play
+            this.playerActive++ ;
+            if( this.playerActive >= players.length){
+                this.playerActive = 0;
+                console.log(this.playerActive);
+            }
+            log += "player "+ players[this.playerActive].name +") ";
+            if( this.players[this.playerActive].hasCards()  ){
+                
+            }
+            $('#log').append('<div class="bs-callout bs-callout-info">'+log+'</div>')
+        }
+    }
+}
