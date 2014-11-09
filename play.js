@@ -19,6 +19,10 @@ $(function () {
     }
     
     dealer.play();
+    $('#state').html(status);
+    for (i = 0; i < dealer.players.length; i++) {
+        $('#player-' + i).html( dealer.players[i].status() );
+    }
     
     console.log("ready!");
 });

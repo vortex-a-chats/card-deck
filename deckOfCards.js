@@ -5,7 +5,8 @@
 function Card(config) {
 
 
-    this.id = 0;
+    this.id = null;
+    this.ownerId = null;
     this.code = '';
     this.name = '';
     this.color = '';
@@ -59,6 +60,7 @@ function Deck() {
 
                 for (j = 0; j < int; j++) {
                     var oneCard = this.cards.pop();
+                    oneCard.ownerId = i;
                     players[i].cards.push(oneCard);
                 }
             }
@@ -109,7 +111,7 @@ function Player(config) {
     this.name = '';
     this.cards = new Array();
     this.stash = ''; // a place to store cards that wont be used
-    this.score = '';
+    this.score = 0;
     this.turnId = '';
     this.hasCards = function () {
         if (this.cards.length > 0) {
@@ -118,7 +120,7 @@ function Player(config) {
         return false;
     };
     this.status = function () {
-        return "player " + this.id + ") " + this.name + ". having " + this.cards.length + "cards";
+        return "player " + this.id + ") " + this.name + ". having <strong>" + this.cards.length + " </strong>cards <br/> <strong>" + this.score + " points</score>";
     };
     for (var attrname in config) {
         this[attrname] = config[attrname];
@@ -135,7 +137,7 @@ function Player(config) {
 function Dealer(players) {
 
     this.players = players;
-    this.maxTurns = 20;
+    this.maxTurns = 21;
     this.playerToStart = 0;
     this.playerActive = 0;
     this.table = new Array(); // place where cards are shown to everyone
@@ -158,10 +160,9 @@ function Dealer(players) {
                 this.table.push(card);
 
                 //if it is the first turn, table is empty and we can not compare, go to next turn.
-//                console.log(this.table.length);
                 if (this.table.length == 1) {
                     log += "puts " + card.name;
-                    this.otherPlayer = this.playerActive.id;
+                    this.otherPlayer = this.playerActive;
                     continue;
                 }
                 else {
@@ -171,15 +172,16 @@ function Dealer(players) {
                     // compare value of cards
                     if (card.points == this.table[0].points) {
                         log += "<br> <div class='alert alert-default'>OMG! a draw!</div> ";
-                        console.log(this.playerActive.id);
-//                        this.players[this.playerActive.id].points++;
-//                        this.players[this.otherPlayer].points++;
+                        this.players[card.ownerId].score++;
+                        this.players[this.otherPlayer].score++;
                     }
                     else {
-                        if(card.points > this.table[0].points){
+                        if (card.points > this.table[0].points) {
+                            this.players[card.ownerId].score++;
                             log += "<br> <div class='alert alert-success'>and wins! booyah!</div>  ";
                         }
-                        else{
+                        else {
+                            this.players[this.otherPlayer].score++;
                             log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH!</div> ";
                         }
                     }
@@ -187,6 +189,9 @@ function Dealer(players) {
                     this.table = new Array();
                 }
 
+            }
+            else {
+                log += "<br> <div class='alert alert-warning'>but he has no cards anymore. snif :C </div> ";
             }
         }
         $('#log').append('<div class="bs-callout bs-callout-info"><p>' + log + '</p></div>')
