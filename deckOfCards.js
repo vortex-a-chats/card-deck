@@ -111,8 +111,8 @@ function Player(config) {
     this.stash = ''; // a place to store cards that wont be used
     this.score = '';
     this.turnId = '';
-    this.hasCards = function(){
-        if( this.cards.length > 0 ){
+    this.hasCards = function () {
+        if (this.cards.length > 0) {
             return true;
         }
         return false;
@@ -132,29 +132,71 @@ function Player(config) {
  * the dealer runs the turns
  * @returns {undefined}
  */
-function Dealer(players){
-    
+function Dealer(players) {
+
     this.players = players;
-    this.maxTurns = 10;
+    this.maxTurns = 20;
     this.playerToStart = 0;
     this.playerActive = 0;
     this.table = new Array(); // place where cards are shown to everyone
+    this.otherPlayer = {}; // player to compare scores with
     // run all the turns
-    this.play = function(){
+    this.play = function () {
+        var log = '';
         console.log(players);
+
         for (i = 0; i < this.maxTurns; i++) {
-            var log = "<br>Turn "+i +") ";
-            // set who's turn it is to play
-            this.playerActive++ ;
-            if( this.playerActive >= players.length){
-                this.playerActive = 0;
-                console.log(this.playerActive);
+            log += "<br>Turn " + i + ") ";
+
+            this.setActivePlayer();
+            log += "player " + players[this.playerActive].name + ") ";
+            var activeGuy = this.players[this.playerActive];
+            if (activeGuy.hasCards()) {
+                // remove a card from the hand
+                var card = activeGuy.cards.pop();
+                // put it on the table
+                this.table.push(card);
+
+                //if it is the first turn, table is empty and we can not compare, go to next turn.
+//                console.log(this.table.length);
+                if (this.table.length == 1) {
+                    log += "puts " + card.name;
+                    this.otherPlayer = this.playerActive.id;
+                    continue;
+                }
+                else {
+                    // determine winner
+                    // update players scores
+                    log += "compares " + card.name;
+                    // compare value of cards
+                    if (card.points == this.table[0].points) {
+                        log += "<br> <div class='alert alert-default'>OMG! a draw!</div> ";
+                        console.log(this.playerActive.id);
+//                        this.players[this.playerActive.id].points++;
+//                        this.players[this.otherPlayer].points++;
+                    }
+                    else {
+                        if(card.points > this.table[0].points){
+                            log += "<br> <div class='alert alert-success'>and wins! booyah!</div>  ";
+                        }
+                        else{
+                            log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH!</div> ";
+                        }
+                    }
+                    // empty table, put cards to grave
+                    this.table = new Array();
+                }
+
             }
-            log += "player "+ players[this.playerActive].name +") ";
-            if( this.players[this.playerActive].hasCards()  ){
-                
-            }
-            $('#log').append('<div class="bs-callout bs-callout-info">'+log+'</div>')
+        }
+        $('#log').append('<div class="bs-callout bs-callout-info"><p>' + log + '</p></div>')
+    }
+    // set who's turn it is to play
+    this.setActivePlayer = function () {
+        this.playerActive++;
+        if (this.playerActive >= players.length) {
+            this.playerActive = 0;
         }
     }
+
 }
