@@ -34,7 +34,10 @@ function Deck() {
     // tells how the deck is.
     this.health = function () {
         var blah = "i am a deck having " + this.cards.length + " cards.";
-        blah += "<br/>";
+        for (i = 0; i < this.cards.length; i++) {
+             blah += "<br/>"+this.cards[i].name;
+        }
+       
         return blah;
     };
     // shuffle the deck
@@ -63,7 +66,8 @@ function Deck() {
     };
 
     // build cards
-    var values = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "Valet", "Dame", "Roi");
+    var values = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "V", "D", "R");
+    var names = new Array("as", 2, 3, 4, 5, 6, 7, 8, 9, 10, "Valet", "Dame", "Roi");
     var colors = new Array("coeur", "trèfle", "carreau", "pique");
     var count = 0;
     for (i = 0; i < colors.length; i++) {
@@ -73,7 +77,7 @@ function Deck() {
                 id: count,
                 color: color,
                 code: j + '-' + color.substring(0, 3),
-                name: j + ' de ' + color,
+                name: names[j] + ' de ' + color,
                 points: j,
             }
             count++;
