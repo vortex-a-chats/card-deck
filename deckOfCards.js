@@ -192,7 +192,6 @@ $(function () {
                         }
                         // empty table, put cards to grave
                         this.table = new Array();
-                        this.refreshView(i, this.players);
                     }
 
                 }
@@ -201,6 +200,7 @@ $(function () {
                     log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> ";
 
                 }
+                this.refreshView(i, this.players, log);
             }
             
         }
@@ -211,7 +211,8 @@ $(function () {
                 this.playerActive = 0;
             }
         }
-        this.refreshView = function (i , players) {
+
+        this.refreshView = function (i , players, log) {
             setTimeout(function () {
                 console.log('refresh lancé ' + 200 * i)
                 for (i = 0; i < players.length; i++) {
