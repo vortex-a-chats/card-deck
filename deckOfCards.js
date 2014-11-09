@@ -192,7 +192,7 @@ $(function () {
                         }
                         // empty table, put cards to grave
                         this.table = new Array();
-                        this.refreshView();
+                        
                     }
 
                 }
@@ -201,8 +201,9 @@ $(function () {
                     log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> ";
 
                 }
+                this.refreshView(i, this.players, log);
             }
-            $('#log').append('<div class="bs-callout bs-callout-info"><p>' + log + '</p></div>')
+            
         }
         // set who's turn it is to play
         this.setActivePlayer = function () {
@@ -211,12 +212,14 @@ $(function () {
                 this.playerActive = 0;
             }
         }
-        this.refreshView = function () {
+        this.refreshView = function (i , players, log) {
             setTimeout(function () {
-                for (i = 0; i < this.players.length; i++) {
-                    $('#player-' + i).html(this.players[i].status());
+                console.log('refresh lancé ' + 200 * i)
+                for (i = 0; i < players.length; i++) {
+                    $('#player-' + i).html(players[i].status());
                 }
-            }, 1000)
+                $('#log').append('<div class="bs-callout bs-callout-info"><p>' + log + '</p></div>')
+            }, 100 * i)
             return;
         }
 
