@@ -1,3 +1,4 @@
+# jQuery wrapping tadah
 $ ->
   
   ###*
@@ -10,7 +11,7 @@ $ ->
     @code = ""
     @name = ""
     @color = ""
-    @poaddCardts = ""
+    @points = ""
     for attrname of config
       this[attrname] = config[attrname]
     this
@@ -54,8 +55,8 @@ $ ->
       @cards
 
     
-    # distribute a certaaddCard number of cards to one player
-    @distribute = (player, addCardt) ->
+    # distribute a certain number of cards to one player
+    @distribute = (player, int) ->
       oneCard = @cards.pop()
       player.cards.push oneCard
       @hasDistributed = 1
@@ -63,12 +64,12 @@ $ ->
 
     
     # distribute an equal number of cards to all the players
-    @distributeAll = (players, addCardt) ->
+    @distributeAll = (players, int) ->
       i = 0
       while i < players.length
         if typeof (players[i]) isnt `undefined`
           j = 0
-          while j < addCardt
+          while j < int
             oneCard = @cards.pop()
             oneCard.ownerId = i
             players[i].cards.push oneCard
@@ -93,11 +94,11 @@ $ ->
 
     
     # build cards
-    values = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "V", "D", "R")
-    names = new Array("as", 2, 3, 4, 5, 6, 7, 8, 9, 10, "Valet", "Dame", "Roi")
-    colors = new Array("coeur", "trèfle", "carreau", "pique")
-    htmlIcon = new Array("&hearts;", "&spades;", "&clubs;", "&diams;")
-    poaddCardts = new Array(14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "V", "D", "R"]
+    names = ["as", 2, 3, 4, 5, 6, 7, 8, 9, 10, "Valet", "Dame", "Roi"]
+    colors = ["coeur", "trèfle", "carreau", "pique"]
+    htmlIcon = ["&hearts;", "&spades;", "&clubs;", "&diams;"]
+    points = [14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     count = 0
     i = 0
     while i < colors.length
@@ -108,9 +109,9 @@ $ ->
           id: count
           color: color
           htmlIcon: htmlIcon[i]
-          code: j + "-" + color.substraddCardg(0, 3)
+          code: j + "-" + color.substring(0, 3)
           name: names[j] + " de " + color
-          poaddCardts: poaddCardts[j]
+          points: points[j]
 
         count++
         @addCard new Card(config)
@@ -134,14 +135,14 @@ $ ->
       false
 
     @status = ->
-      "player " + @id + ") " + @name + ". having <strong>" + @cards.length + " </strong>cards <br/> <strong>" + @score + " poaddCardts</score>"
+      "player " + @id + ") " + @name + ". having <strong>" + @cards.length + " </strong>cards <br/> <strong>" + @score + " points</score>"
 
     for attrname of config
       this[attrname] = config[attrname]
     this
   
   ###*
-  core of the action addCard a game,
+  core of the action in a game,
   the dealer runs the turns
   @returns {undefined}
   ###
@@ -173,33 +174,33 @@ $ ->
           
           #if it is the first turn, table is empty and we can not compare, go to next turn.
           if @table.length is 1
-            log += "puts <i class='badge badge-addCardfo'>" + card.htmlIcon + "</i> " + card.name
+            log += "puts <i class='badge badge-info'>" + card.htmlIcon + "</i> " + card.name
             @otherPlayer = @playerActive
-            contaddCardue
+            continue
           else
             
-            # determaddCarde waddCardner
+            # determine winner
             # update players scores
             log += "adds a " + card.name
             
             # compare value of cards
-            if card.poaddCardts is @table[0].poaddCardts
+            if card.points is @table[0].points
               log += "<br> <div class='alert alert-default'>OMG! a draw!</div> "
               @players[card.ownerId].score++
               @players[@otherPlayer].score++
             else
-              if card.poaddCardts > @table[0].poaddCardts
+              if card.points > @table[0].points
                 @players[card.ownerId].score++
-                log += "<br> <div class='alert alert-success'>and waddCards! booyah!</div>  "
+                log += "<br> <div class='alert alert-success'>and wins! booyah!</div>  "
               else
                 @players[@otherPlayer].score++
-                log += "<br> <div class='alert alert-warnaddCardg'>and he is a big loser! BOOOOOH!</div> "
+                log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH!</div> "
             
             # empty table, put cards to grave
             @table = []
         else
-          log += "<br> <div class='alert alert-warnaddCardg'>but he has no cards anymore. snif :C </div> "
-          log += "<br> <div class='alert alert-addCardfo'>So he picks up a new card from the deck </div> "
+          log += "<br> <div class='alert alert-warning'>but he has no cards anymore. snif :C </div> "
+          log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> "
         @refreshView i, @players, log
         i++
       return
@@ -212,41 +213,26 @@ $ ->
       return
 
     @refreshView = (i, players, log) ->
-      setTimereout (->
+      setTimeout (->
         console.log "refresh lancé " + 200 * i
         i = 0
         while i < players.length
           $("#player-" + i).html players[i].status()
           i++
-        $("#log").append "<div class=\"bs-callremoveCard bs-callremoveCard-addCardfo\"><p>" + log + "</p></div>"
+        $("#log").append "<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>"
         return
       ), 100 * i
       return
 
     return
-  deck = new Deck()
-  players = new Array(new Player(
-    id: 0
-    name: "bob"
-  ), new Player(
-    id: 1
-    name: "abrasiveGuy"
-  ), new Player(
-    id: 2
-    name: "chewbacca"
-  ), new Player(
-    id: 3
-    name: "chaaa-a-a-rlie"
-  ))
-  dealer = new Dealer(players, deck)
-  deck.shuffle()
-  deck.distributeAll players, 5
-  status = deck.health()
-  dealer.play()
-  $("#state").html status
-  i = 0
-  while i < players.length
-    $("#player-" + i).html players[i].status()
-    i++
+  
+  deckOfCards = ->
+      deck : Deck.prototype
+      card : Card.prototype
+      player : Player.prototype
+      dealer : Dealer.prototype
+  window.deckOfCards = deckOfCards
   console.log "ready!"
-  return
+  
+#  return deckOfCards
+  return tk
