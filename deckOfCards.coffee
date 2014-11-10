@@ -138,6 +138,7 @@ $ ->
     @id = 0
     @name = ""
     @cards = []
+    @cardsOrigin = []
     @stash = "" # a place to store cards that wont be used
     @score = 0
     @victory = 0
@@ -165,7 +166,7 @@ $ ->
   Dealer = (players, deck) ->
     @players = players
     @deck = deck
-    @maxTurns = 21
+    @maxTurns = 10
     @playerToStart = 0
     @playerActive = 0
     @table = [] # place where cards are shown to everyone
@@ -173,13 +174,15 @@ $ ->
     # run all the turns
     @play = ->
       log = ""
-      i = 0
-      while i < @maxTurns
+      i = 1
+      while i <= @maxTurns
+        
         log += "<br>Turn " + i + ") "
-        i++
+        console.log "+++++++"+log
         @setActivePlayer()
-        log += "player " + players[@playerActive].name + ") "
         activeGuy = @players[@playerActive]
+        log += "player " + activeGuy.name + ") "
+        i++
         if activeGuy.hasCards()
           console.log activeGuy.cards.length+" cards"
           # remove a card from the hand
@@ -204,36 +207,38 @@ $ ->
             # draw case
             if card.points is @table[0].points
               log += "<br> <div class='alert alert-"+"default'>OMG! a draw!</div> "
-#              @players[card.ownerId].score++
-#              @players[@otherPlayer].score++
-              @playerActive.score++
-              @otherPlayer.score++
+              activeGuy.score++
+              @players[@otherPlayer].score++
+ 
             else
               # current player wins
               if card.points > @table[0].points
-                @players[card.ownerId].score++
-                log += "<br> <div class='alert alert-success'>and "+@players[card.ownerId].name+" wins! booyah!</div>  "
+                activeGuy.score++
+                log += "<br> <div class='alert alert-success'>and "+activeGuy.name+" wins! booyah!</div>  "
                 @deck.distribute(@players[@otherPlayer], 1)
                 log += "<br> <div class='alert alert-info'>"+@players[@otherPlayer].name+" picks a new card from the deck, he has now "+@players[@otherPlayer].cards.length+"</div> "
               else
                 # current player loses
                 @players[@otherPlayer].score++
-                @deck.distribute(@players[card.ownerId], 1)
-                log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH!</div> "
+                @deck.distribute(activeGuy, 1)
+                log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH! <br/>He picks a card.</div> "
             # empty table, put cards to grave
             @table = []
         else
-          log += "<br> <div class='alert alert-success'><h1>but he has no cards anymore. he WON the game!</h1></div> "
+          log += "<br> <div class='alert alert-success'><h1> "+activeGuy.name+" WONS the game! He has no cards anymore.</h1></div> "
           $("#log").append("<br> <h2>Game Over</h2> ")
-          @players[card.ownerId].victory++
-          @refreshView i, @players, log
-          i = @maxTurns
+          activeGuy.victory++
+          tempCounter = i
+          @refreshView tempCounter, @players, "vainqueur"+log
+#          i = @maxTurns
+          console.log i,@maxTurns
           break
-        $("#log").prepend("<br> pas de vainqueur a la fin des tours")
-#          log += "<br> <div class='alert alert-warning'>but he has no cards anymore. snif :C </div> "
-#          log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> "
-    #      @deck.distribute(@players[card.ownerId], 1)
-        @refreshView i, @players, log
+          
+#        $("#log").prepend("<br> pas de vainqueur a la fin des tours")
+        tempCounter = i
+        @refreshView tempCounter, @players, "normal"+log
+        
+        
     # set who's turn it is to play
     @setActivePlayer = ->
       @playerActive++
@@ -242,12 +247,14 @@ $ ->
     @refreshView = (i, players, log) ->
       status = deck.health()
       $("#state").html status
-      i = 0
+      text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>"
+      $("#log").append " <h2>tour "+i+"</h2> "+text
+      var i = 0
       while i < @players.length
         $("#player-" + i).html players[i].status()
         i++
-        text = "<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>"
-        $("#log").append text
+      
+        
       text
     this
 

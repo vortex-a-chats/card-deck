@@ -137,6 +137,7 @@ $(function() {
     this.id = 0;
     this.name = "";
     this.cards = [];
+    this.cardsOrigin = [];
     this.stash = "";
     this.score = 0;
     this.victory = 0;
@@ -170,22 +171,23 @@ $(function() {
   Dealer = function(players, deck) {
     this.players = players;
     this.deck = deck;
-    this.maxTurns = 21;
+    this.maxTurns = 10;
     this.playerToStart = 0;
     this.playerActive = 0;
     this.table = [];
     this.otherPlayer = {};
     this.play = function() {
-      var activeGuy, card, i, log, _results;
+      var activeGuy, card, i, log, tempCounter, _results;
       log = "";
-      i = 0;
+      i = 1;
       _results = [];
-      while (i < this.maxTurns) {
+      while (i <= this.maxTurns) {
         log += "<br>Turn " + i + ") ";
-        i++;
+        console.log("+++++++" + log);
         this.setActivePlayer();
-        log += "player " + players[this.playerActive].name + ") ";
         activeGuy = this.players[this.playerActive];
+        log += "player " + activeGuy.name + ") ";
+        i++;
         if (activeGuy.hasCards()) {
           console.log(activeGuy.cards.length + " cards");
           card = activeGuy.cards.pop();
@@ -200,32 +202,33 @@ $(function() {
             log += "adds a <i class='badge badge-info'>" + card.htmlIcon + " " + (card.points + 1) + "</i> " + card.name;
             if (card.points === this.table[0].points) {
               log += "<br> <div class='alert alert-" + "default'>OMG! a draw!</div> ";
-              this.playerActive.score++;
-              this.otherPlayer.score++;
+              activeGuy.score++;
+              this.players[this.otherPlayer].score++;
             } else {
               if (card.points > this.table[0].points) {
-                this.players[card.ownerId].score++;
-                log += "<br> <div class='alert alert-success'>and " + this.players[card.ownerId].name + " wins! booyah!</div>  ";
+                activeGuy.score++;
+                log += "<br> <div class='alert alert-success'>and " + activeGuy.name + " wins! booyah!</div>  ";
                 this.deck.distribute(this.players[this.otherPlayer], 1);
                 log += "<br> <div class='alert alert-info'>" + this.players[this.otherPlayer].name + " picks a new card from the deck, he has now " + this.players[this.otherPlayer].cards.length + "</div> ";
               } else {
                 this.players[this.otherPlayer].score++;
-                this.deck.distribute(this.players[card.ownerId], 1);
-                log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH!</div> ";
+                this.deck.distribute(activeGuy, 1);
+                log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH! <br/>He picks a card.</div> ";
               }
             }
             this.table = [];
           }
         } else {
-          log += "<br> <div class='alert alert-success'><h1>but he has no cards anymore. he WON the game!</h1></div> ";
+          log += "<br> <div class='alert alert-success'><h1>" + activeGuy.name + "has no cards anymore. he WON the game!</h1></div> ";
           $("#log").append("<br> <h2>Game Over</h2> ");
-          this.players[card.ownerId].victory++;
-          this.refreshView(i, this.players, log);
-          i = this.maxTurns;
+          activeGuy.victory++;
+          tempCounter = i;
+          this.refreshView(tempCounter, this.players, "vainqueur" + log);
+          console.log(i, this.maxTurns);
           break;
         }
-        $("#log").prepend("<br> pas de vainqueur a la fin des tours");
-        _results.push(this.refreshView(i, this.players, log));
+        tempCounter = i;
+        _results.push(this.refreshView(tempCounter, this.players, "normal" + log));
       }
       return _results;
     };
@@ -239,12 +242,12 @@ $(function() {
       var status, text;
       status = deck.health();
       $("#state").html(status);
+      text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>";
+      $("#log").append(" <h2>tour " + i + "</h2> " + text);
       i = 0;
       while (i < this.players.length) {
         $("#player-" + i).html(players[i].status());
         i++;
-        text = "<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>";
-        $("#log").append(text);
       }
       return text;
     };

@@ -6,10 +6,10 @@ $ ->
       id: 0
       name: "bob"
     ),
-#    new d.player(
-#      id: 1
-#      name: "abrasiveGuy"
-#    ),
+    new d.player(
+      id: 1
+      name: "abrasiveGuy"
+    ),
     new d.player(
       id: 2
       name: "chewbacca"
