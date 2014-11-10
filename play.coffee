@@ -1,6 +1,8 @@
 $ ->
   d = new deckOfCards()
+  
   deck = new d.deck()
+  
   players = [new d.player(
     id: 0
     name: "bob"
@@ -14,7 +16,8 @@ $ ->
     id: 3
     name: "chaaa-a-a-rlie"
   )]
-  console.log players
+  console.log 'deck ',deck
+  console.log 'players ',players
   dealer = new d.dealer(players, deck)
   deck.shuffle()
   deck.distributeAll players, 5

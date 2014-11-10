@@ -32,12 +32,15 @@ $ ->
     # tells how the deck is.
     @health = ->
       blah = "i am a deck having " + @cards.length + " cards."
+
+      blah
+    @tellCards = ->
       i = 0
       while i < @cards.length
         blah += "<br/>" + @cards[i].name
         i++
       blah
-
+      
     
     # shuffle the deck
     @shuffle = ->
@@ -227,12 +230,13 @@ $ ->
     return
   
   deckOfCards = ->
-      deck : Deck.prototype
-      card : Card.prototype
-      player : Player.prototype
-      dealer : Dealer.prototype
+    deck : Deck
+    card : Card
+    player : Player
+    dealer : Dealer
   window.deckOfCards = deckOfCards
   console.log "ready!"
   
-#  return deckOfCards
-  return tk
+  return deckOfCards
+#  return tk
+#

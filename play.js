@@ -17,7 +17,8 @@ $(function() {
       name: "chaaa-a-a-rlie"
     })
   ];
-  console.log(players);
+  console.log('deck ', deck);
+  console.log('players ', players);
   dealer = new d.dealer(players, deck);
   deck.shuffle();
   deck.distributeAll(players, 5);

@@ -29,8 +29,12 @@ $(function() {
     this.hasDistributed = 0;
     this.graveyard = [];
     this.health = function() {
-      var blah, i;
+      var blah;
       blah = "i am a deck having " + this.cards.length + " cards.";
+      return blah;
+    };
+    this.tellCards = function() {
+      var i;
       i = 0;
       while (i < this.cards.length) {
         blah += "<br/>" + this.cards[i].name;
