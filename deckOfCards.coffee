@@ -230,7 +230,7 @@ $ ->
           activeGuy.victory++
           tempCounter = i
           @refreshView tempCounter, @players, "vainqueur"+log
-#          i = @maxTurns
+          i = @maxTurns
           console.log i,@maxTurns
           break
           
@@ -244,15 +244,15 @@ $ ->
       @playerActive++
       @playerActive = 0  if @playerActive >= players.length
 
-    @refreshView = (i, players, log) ->
+    @refreshView = (tempCount, players, log) ->
       status = deck.health()
       $("#state").html status
       text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>"
-      $("#log").append " <h2>tour "+i+"</h2> "+text
-      var i = 0
-      while i < @players.length
-        $("#player-" + i).html players[i].status()
-        i++
+      $("#log").append " <h2>tour "+tempCount+"</h2> "+text
+      tempCount = 0
+      while tempCount < @players.length
+        $("#player-" + tempCount).html players[tempCount].status()
+        tempCount++
       
         
       text

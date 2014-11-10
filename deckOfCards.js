@@ -219,11 +219,12 @@ $(function() {
             this.table = [];
           }
         } else {
-          log += "<br> <div class='alert alert-success'><h1>" + activeGuy.name + "has no cards anymore. he WON the game!</h1></div> ";
+          log += "<br> <div class='alert alert-success'><h1> " + activeGuy.name + " WONS the game! He has no cards anymore.</h1></div> ";
           $("#log").append("<br> <h2>Game Over</h2> ");
           activeGuy.victory++;
           tempCounter = i;
           this.refreshView(tempCounter, this.players, "vainqueur" + log);
+          i = this.maxTurns;
           console.log(i, this.maxTurns);
           break;
         }
@@ -238,16 +239,16 @@ $(function() {
         return this.playerActive = 0;
       }
     };
-    this.refreshView = function(i, players, log) {
+    this.refreshView = function(tempCount, players, log) {
       var status, text;
       status = deck.health();
       $("#state").html(status);
       text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>";
-      $("#log").append(" <h2>tour " + i + "</h2> " + text);
-      i = 0;
-      while (i < this.players.length) {
-        $("#player-" + i).html(players[i].status());
-        i++;
+      $("#log").append(" <h2>tour " + tempCount + "</h2> " + text);
+      tempCount = 0;
+      while (tempCount < this.players.length) {
+        $("#player-" + tempCount).html(players[tempCount].status());
+        tempCount++;
       }
       return text;
     };
