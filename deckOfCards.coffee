@@ -60,13 +60,19 @@ $ ->
     
     # distribute a certain number of cards to one player
     @distribute = (player, int) ->
+      console.log 'le deck avait '+@cards.length+' cartes'
+      console.log 'distribution de carte à '+player.name+' (qui a '+player.cards.length+' cartes)'
       i = 0
+      if int is i
+        return
       while i < int
         oneCard = @cards.pop()
         player.cards.push oneCard
+        i++
       @hasDistributed = 1
+      console.log  player.name+' (qui a '+player.cards.length+' cartes)'
       i
-
+      
     
     # distribute an equal number of cards to all the players
     @distributeAll = (players, int) ->
@@ -134,13 +140,18 @@ $ ->
     @cards = []
     @stash = "" # a place to store cards that wont be used
     @score = 0
+    @victory = 0
     @turnId = ""
     @hasCards = ->
       return true  if @cards.length > 0
       false
 
     @status = ->
-      "player " + @id + ") " + @name + ". having <strong>" + @cards.length + " </strong>cards <br/> <strong>" + @score + " points</score>"
+      content = "player " + @id + ") " + @name + ". having <strong>" + @cards.length + " </strong>cards <br/> <strong>" + @score + " points</score>"
+      text = content
+      if @victory
+        text = "<div class='alert-success alert'>"+content+"</div>"
+      text
 
     for attrname of config
       this[attrname] = config[attrname]
@@ -170,42 +181,57 @@ $ ->
         log += "player " + players[@playerActive].name + ") "
         activeGuy = @players[@playerActive]
         if activeGuy.hasCards()
-
+          console.log activeGuy.cards.length+" cards"
           # remove a card from the hand
           card = activeGuy.cards.pop()
-
+          card.ownerId = activeGuy.id
+          console.log activeGuy.cards.length+" cards"
           # put it on the table
           @table.push card
 
           #if it is the first turn, table is empty and we can not compare, go to next turn.
           if @table.length is 1
-            log += "puts <i class='badge badge-info'>" + card.htmlIcon + "</i> " + card.name
+            log += "puts <i class='badge badge-info'>" + card.htmlIcon + " "+(card.points+1)+"</i> " + card.name
             @otherPlayer = @playerActive
             continue
           else
 
             # determine winner
             # update players scores
-            log += "adds a " + card.name
+            log += "adds a <i class='badge badge-info'>" + card.htmlIcon + " "+(card.points+1)+"</i> " + card.name
 
             # compare value of cards
+            # draw case
             if card.points is @table[0].points
-              log += "<br> <div class='alert alert-default'>OMG! a draw!</div> "
-              @players[card.ownerId].score++
-              @players[@otherPlayer].score++
+              log += "<br> <div class='alert alert-"+"default'>OMG! a draw!</div> "
+#              @players[card.ownerId].score++
+#              @players[@otherPlayer].score++
+              @playerActive.score++
+              @otherPlayer.score++
             else
+              # current player wins
               if card.points > @table[0].points
                 @players[card.ownerId].score++
-                log += "<br> <div class='alert alert-success'>and wins! booyah!</div>  "
+                log += "<br> <div class='alert alert-success'>and "+@players[card.ownerId].name+" wins! booyah!</div>  "
+                @deck.distribute(@players[@otherPlayer], 1)
+                log += "<br> <div class='alert alert-info'>"+@players[@otherPlayer].name+" picks a new card from the deck, he has now "+@players[@otherPlayer].cards.length+"</div> "
               else
+                # current player loses
                 @players[@otherPlayer].score++
+                @deck.distribute(@players[card.ownerId], 1)
                 log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH!</div> "
-
             # empty table, put cards to grave
             @table = []
         else
-          log += "<br> <div class='alert alert-warning'>but he has no cards anymore. snif :C </div> "
-          log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> "
+          log += "<br> <div class='alert alert-success'><h1>but he has no cards anymore. he WON the game!</h1></div> "
+          $("#log").append("<br> <h2>Game Over</h2> ")
+          @players[card.ownerId].victory++
+          @refreshView i, @players, log
+          i = @maxTurns
+          break
+        $("#log").prepend("<br> pas de vainqueur a la fin des tours")
+#          log += "<br> <div class='alert alert-warning'>but he has no cards anymore. snif :C </div> "
+#          log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> "
     #      @deck.distribute(@players[card.ownerId], 1)
         @refreshView i, @players, log
     # set who's turn it is to play
@@ -214,12 +240,14 @@ $ ->
       @playerActive = 0  if @playerActive >= players.length
 
     @refreshView = (i, players, log) ->
+      status = deck.health()
+      $("#state").html status
       i = 0
       while i < @players.length
         $("#player-" + i).html players[i].status()
         i++
         text = "<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>"
-        $("#log").prepend text
+        $("#log").append text
       text
     this
 

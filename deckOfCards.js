@@ -59,12 +59,19 @@ $(function() {
     };
     this.distribute = function(player, int) {
       var i, oneCard;
+      console.log('le deck avait ' + this.cards.length + ' cartes');
+      console.log('distribution de carte à ' + player.name + ' (qui a ' + player.cards.length + ' cartes)');
       i = 0;
+      if (int === i) {
+        return;
+      }
       while (i < int) {
         oneCard = this.cards.pop();
         player.cards.push(oneCard);
+        i++;
       }
       this.hasDistributed = 1;
+      console.log(player.name + ' (qui a ' + player.cards.length + ' cartes)');
       return i;
     };
     this.distributeAll = function(players, int) {
@@ -132,6 +139,7 @@ $(function() {
     this.cards = [];
     this.stash = "";
     this.score = 0;
+    this.victory = 0;
     this.turnId = "";
     this.hasCards = function() {
       if (this.cards.length > 0) {
@@ -140,7 +148,13 @@ $(function() {
       return false;
     };
     this.status = function() {
-      return "player " + this.id + ") " + this.name + ". having <strong>" + this.cards.length + " </strong>cards <br/> <strong>" + this.score + " points</score>";
+      var content, text;
+      content = "player " + this.id + ") " + this.name + ". having <strong>" + this.cards.length + " </strong>cards <br/> <strong>" + this.score + " points</score>";
+      text = content;
+      if (this.victory) {
+        text = "<div class='alert-success alert'>" + content + "</div>";
+      }
+      return text;
     };
     for (attrname in config) {
       this[attrname] = config[attrname];
@@ -173,33 +187,44 @@ $(function() {
         log += "player " + players[this.playerActive].name + ") ";
         activeGuy = this.players[this.playerActive];
         if (activeGuy.hasCards()) {
+          console.log(activeGuy.cards.length + " cards");
           card = activeGuy.cards.pop();
+          card.ownerId = activeGuy.id;
+          console.log(activeGuy.cards.length + " cards");
           this.table.push(card);
           if (this.table.length === 1) {
-            log += "puts <i class='badge badge-info'>" + card.htmlIcon + "</i> " + card.name;
+            log += "puts <i class='badge badge-info'>" + card.htmlIcon + " " + (card.points + 1) + "</i> " + card.name;
             this.otherPlayer = this.playerActive;
             continue;
           } else {
-            log += "adds a " + card.name;
+            log += "adds a <i class='badge badge-info'>" + card.htmlIcon + " " + (card.points + 1) + "</i> " + card.name;
             if (card.points === this.table[0].points) {
-              log += "<br> <div class='alert alert-default'>OMG! a draw!</div> ";
-              this.players[card.ownerId].score++;
-              this.players[this.otherPlayer].score++;
+              log += "<br> <div class='alert alert-" + "default'>OMG! a draw!</div> ";
+              this.playerActive.score++;
+              this.otherPlayer.score++;
             } else {
               if (card.points > this.table[0].points) {
                 this.players[card.ownerId].score++;
-                log += "<br> <div class='alert alert-success'>and wins! booyah!</div>  ";
+                log += "<br> <div class='alert alert-success'>and " + this.players[card.ownerId].name + " wins! booyah!</div>  ";
+                this.deck.distribute(this.players[this.otherPlayer], 1);
+                log += "<br> <div class='alert alert-info'>" + this.players[this.otherPlayer].name + " picks a new card from the deck, he has now " + this.players[this.otherPlayer].cards.length + "</div> ";
               } else {
                 this.players[this.otherPlayer].score++;
+                this.deck.distribute(this.players[card.ownerId], 1);
                 log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH!</div> ";
               }
             }
             this.table = [];
           }
         } else {
-          log += "<br> <div class='alert alert-warning'>but he has no cards anymore. snif :C </div> ";
-          log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> ";
+          log += "<br> <div class='alert alert-success'><h1>but he has no cards anymore. he WON the game!</h1></div> ";
+          $("#log").append("<br> <h2>Game Over</h2> ");
+          this.players[card.ownerId].victory++;
+          this.refreshView(i, this.players, log);
+          i = this.maxTurns;
+          break;
         }
+        $("#log").prepend("<br> pas de vainqueur a la fin des tours");
         _results.push(this.refreshView(i, this.players, log));
       }
       return _results;
@@ -211,13 +236,15 @@ $(function() {
       }
     };
     this.refreshView = function(i, players, log) {
-      var text;
+      var status, text;
+      status = deck.health();
+      $("#state").html(status);
       i = 0;
       while (i < this.players.length) {
         $("#player-" + i).html(players[i].status());
         i++;
         text = "<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>";
-        $("#log").prepend(text);
+        $("#log").append(text);
       }
       return text;
     };
