@@ -16,6 +16,6 @@ $(function() {
   ];
   dealer = new d.dealer(players, deck);
   deck.shuffle();
-  deck.distributeAll(players, 1);
+  deck.distributeAll(players, 10);
   return dealer.play();
 });

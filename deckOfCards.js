@@ -183,11 +183,10 @@ $(function() {
       _results = [];
       while (i <= this.maxTurns) {
         log += "<br>Turn " + i + ") ";
-        console.log("+++++++" + log);
         this.setActivePlayer();
         activeGuy = this.players[this.playerActive];
-        log += "player " + activeGuy.name + ") ";
         i++;
+        log += "player " + activeGuy.name + ") ";
         if (activeGuy.hasCards()) {
           console.log(activeGuy.cards.length + " cards");
           card = activeGuy.cards.pop();
@@ -233,6 +232,7 @@ $(function() {
       }
       return _results;
     };
+    this.fight = function(p1, p2) {};
     this.setActivePlayer = function() {
       this.playerActive++;
       if (this.playerActive >= players.length) {

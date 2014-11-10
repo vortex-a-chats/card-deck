@@ -178,11 +178,11 @@ $ ->
       while i <= @maxTurns
         
         log += "<br>Turn " + i + ") "
-        console.log "+++++++"+log
         @setActivePlayer()
         activeGuy = @players[@playerActive]
-        log += "player " + activeGuy.name + ") "
         i++
+        log += "player " + activeGuy.name + ") "
+        
         if activeGuy.hasCards()
           console.log activeGuy.cards.length+" cards"
           # remove a card from the hand
@@ -237,8 +237,11 @@ $ ->
 #        $("#log").prepend("<br> pas de vainqueur a la fin des tours")
         tempCounter = i
         @refreshView tempCounter, @players, "normal"+log
-        
-        
+    # fight between two players
+    # returns the winner
+    @fight = (p1 , p2)->
+      #TODO
+      
     # set who's turn it is to play
     @setActivePlayer = ->
       @playerActive++
