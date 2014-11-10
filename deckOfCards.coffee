@@ -60,10 +60,12 @@ $ ->
     
     # distribute a certain number of cards to one player
     @distribute = (player, int) ->
-      oneCard = @cards.pop()
-      player.cards.push oneCard
+      i = 0
+      while i < int
+        oneCard = @cards.pop()
+        player.cards.push oneCard
       @hasDistributed = 1
-      true
+      i
 
     
     # distribute an equal number of cards to all the players
@@ -160,32 +162,32 @@ $ ->
     # run all the turns
     @play = ->
       log = ""
-      console.log players
       i = 0
       while i < @maxTurns
         log += "<br>Turn " + i + ") "
+        i++
         @setActivePlayer()
         log += "player " + players[@playerActive].name + ") "
         activeGuy = @players[@playerActive]
         if activeGuy.hasCards()
-          
+
           # remove a card from the hand
           card = activeGuy.cards.pop()
-          
+
           # put it on the table
           @table.push card
-          
+
           #if it is the first turn, table is empty and we can not compare, go to next turn.
           if @table.length is 1
             log += "puts <i class='badge badge-info'>" + card.htmlIcon + "</i> " + card.name
             @otherPlayer = @playerActive
             continue
           else
-            
+
             # determine winner
             # update players scores
             log += "adds a " + card.name
-            
+
             # compare value of cards
             if card.points is @table[0].points
               log += "<br> <div class='alert alert-default'>OMG! a draw!</div> "
@@ -198,45 +200,33 @@ $ ->
               else
                 @players[@otherPlayer].score++
                 log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH!</div> "
-            
+
             # empty table, put cards to grave
             @table = []
         else
           log += "<br> <div class='alert alert-warning'>but he has no cards anymore. snif :C </div> "
           log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> "
+    #      @deck.distribute(@players[card.ownerId], 1)
         @refreshView i, @players, log
-        i++
-      return
-
-    
     # set who's turn it is to play
     @setActivePlayer = ->
       @playerActive++
       @playerActive = 0  if @playerActive >= players.length
-      return
 
     @refreshView = (i, players, log) ->
-      setTimeout (->
-        console.log "refresh lancé " + 200 * i
-        i = 0
-        while i < players.length
-          $("#player-" + i).html players[i].status()
-          i++
-        $("#log").append "<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>"
-        return
-      ), 100 * i
-      return
+      i = 0
+      while i < @players.length
+        $("#player-" + i).html players[i].status()
+        i++
+        text = "<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>"
+        $("#log").prepend text
+      text
+    this
 
-    return
-  
   deckOfCards = ->
     deck : Deck
     card : Card
     player : Player
     dealer : Dealer
   window.deckOfCards = deckOfCards
-  console.log "ready!"
-  
-  return deckOfCards
-#  return tk
-#
+  console.log "deckOfCards is ready!"

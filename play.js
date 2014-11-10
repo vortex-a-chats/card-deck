@@ -1,6 +1,7 @@
 $(function() {
   var d, dealer, deck, i, players, status, _results;
   d = new deckOfCards();
+  console.log('deckOfCards ', d);
   deck = new d.deck();
   players = [
     new d.player({
@@ -20,6 +21,7 @@ $(function() {
   console.log('deck ', deck);
   console.log('players ', players);
   dealer = new d.dealer(players, deck);
+  console.log('d.dealer ', d.dealer);
   deck.shuffle();
   deck.distributeAll(players, 5);
   status = deck.health();

@@ -58,11 +58,14 @@ $(function() {
       return this.cards;
     };
     this.distribute = function(player, int) {
-      var oneCard;
-      oneCard = this.cards.pop();
-      player.cards.push(oneCard);
+      var i, oneCard;
+      i = 0;
+      while (i < int) {
+        oneCard = this.cards.pop();
+        player.cards.push(oneCard);
+      }
       this.hasDistributed = 1;
-      return true;
+      return i;
     };
     this.distributeAll = function(players, int) {
       var i, j, oneCard;
@@ -159,12 +162,13 @@ $(function() {
     this.table = [];
     this.otherPlayer = {};
     this.play = function() {
-      var activeGuy, card, i, log;
+      var activeGuy, card, i, log, _results;
       log = "";
-      console.log(players);
       i = 0;
+      _results = [];
       while (i < this.maxTurns) {
         log += "<br>Turn " + i + ") ";
+        i++;
         this.setActivePlayer();
         log += "player " + players[this.playerActive].name + ") ";
         activeGuy = this.players[this.playerActive];
@@ -196,27 +200,28 @@ $(function() {
           log += "<br> <div class='alert alert-warning'>but he has no cards anymore. snif :C </div> ";
           log += "<br> <div class='alert alert-info'>So he picks up a new card from the deck </div> ";
         }
-        this.refreshView(i, this.players, log);
-        i++;
+        _results.push(this.refreshView(i, this.players, log));
       }
+      return _results;
     };
     this.setActivePlayer = function() {
       this.playerActive++;
       if (this.playerActive >= players.length) {
-        this.playerActive = 0;
+        return this.playerActive = 0;
       }
     };
     this.refreshView = function(i, players, log) {
-      setTimeout((function() {
-        console.log("refresh lancé " + 200 * i);
-        i = 0;
-        while (i < players.length) {
-          $("#player-" + i).html(players[i].status());
-          i++;
-        }
-        $("#log").append("<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>");
-      }), 100 * i);
+      var text;
+      i = 0;
+      while (i < this.players.length) {
+        $("#player-" + i).html(players[i].status());
+        i++;
+        text = "<div class=\"bs-callremoveCard bs-callremoveCard-info\"><p>" + log + "</p></div>";
+        $("#log").prepend(text);
+      }
+      return text;
     };
+    return this;
   };
   deckOfCards = function() {
     return {
@@ -227,6 +232,5 @@ $(function() {
     };
   };
   window.deckOfCards = deckOfCards;
-  console.log("ready!");
-  return deckOfCards;
+  return console.log("deckOfCards is ready!");
 });
