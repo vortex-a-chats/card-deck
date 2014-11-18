@@ -167,76 +167,114 @@ $ ->
     @players = players
     @deck = deck
     @maxTurns = 10
+    @turn = 0
     @playerToStart = 0
     @playerActive = 0
     @table = [] # place where cards are shown to everyone
     @otherPlayer = {} # player to compare scores with
+    # ask active player to do something
+    @askInput = ->
+      console.log('en attente du joueur')
+      @activeGuy = @players[@playerActive];
+      $('#input-instructions').html('play a card with a high value')
+      #list the cards of the player.
+      cards = @activeGuy.cards
+      choice = ''
+      choice = @cards2html(cards)
+      $('#input-choice').html(choice)
+      
+    
+    
+    @cards2html = (cards)->
+      listing = ''
+      for c in cards  
+        listing += '<button class="card col-lg-1" data-id="'+c.id+' data-playerid="'+@activeGuy.id+'">'+c.name+'</button>'
+      listing
+    
+    @interactionsJQ = ->
+      
+#      console.log this
+    @oneTurn = ->
+      @askInput()
+      @interactionsJQ()
+      
     # run all the turns
     @play = ->
       log = ""
       i = 1
-      while i <= @maxTurns
-        
-        log += "<br>Turn " + i + ") "
-        @setActivePlayer()
-        activeGuy = @players[@playerActive]
-        i++
-        log += "player " + activeGuy.name + ") "
-        
-        if activeGuy.hasCards()
-          console.log activeGuy.cards.length+" cards"
-          # remove a card from the hand
-          card = activeGuy.cards.pop()
-          card.ownerId = activeGuy.id
-          console.log activeGuy.cards.length+" cards"
-          # put it on the table
-          @table.push card
-
-          #if it is the first turn, table is empty and we can not compare, go to next turn.
-          if @table.length is 1
-            log += "puts <i class='badge badge-info'>" + card.htmlIcon + " "+(card.points+1)+"</i> " + card.name
-            @otherPlayer = @playerActive
-            continue
-          else
-
-            # determine winner
-            # update players scores
-            log += "adds a <i class='badge badge-info'>" + card.htmlIcon + " "+(card.points+1)+"</i> " + card.name
-
-            # compare value of cards
-            # draw case
-            if card.points is @table[0].points
-              log += "<br> <div class='alert alert-"+"default'>OMG! a draw!</div> "
-              activeGuy.score++
-              @players[@otherPlayer].score++
- 
-            else
-              # current player wins
-              if card.points > @table[0].points
-                activeGuy.score++
-                log += "<br> <div class='alert alert-success'>and "+activeGuy.name+" wins! booyah!</div>  "
-                @deck.distribute(@players[@otherPlayer], 1)
-                log += "<br> <div class='alert alert-info'>"+@players[@otherPlayer].name+" picks a new card from the deck, he has now "+@players[@otherPlayer].cards.length+"</div> "
-              else
-                # current player loses
-                @players[@otherPlayer].score++
-                @deck.distribute(activeGuy, 1)
-                log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH! <br/>He picks a card.</div> "
-            # empty table, put cards to grave
-            @table = []
-        else
-          log += "<br> <div class='alert alert-success'><h1> "+activeGuy.name+" WONS the game! He has no cards anymore.</h1></div> "
-          $("#log").append("<br> <h2>Game Over</h2> ")
-          activeGuy.victory++
-          tempCounter = i
-          @refreshView tempCounter, @players, "vainqueur"+log
-          i = @maxTurns
-          console.log i,@maxTurns
-          break
-          
-#        $("#log").prepend("<br> pas de vainqueur a la fin des tours")
-        tempCounter = i
-        @refreshView tempCounter, @players, "normal"+log
+      
+      @oneTurn()
+#      @refreshView tempCounter, @players, "normal"+log
+#      while i <= (@players.length * 2 - 1)
+#        
+#        log += "<br>Turn " + i + ") "
+#        @setActivePlayer()
+#        activeGuy = @players[@playerActive]
+#        if @playerActive > 0
+#          previousGuy = @players[@playerActive-1]
+#          @fight(activeGuy, previousGuy)
+#        else
+#          
+#          if activeGuy.hasCards()
+#            # remove a card from the hand
+#            card = activeGuy.cards.pop()
+#            card.ownerId = activeGuy.id
+#            @putCardToTable(card)
+#
+#          #if it is the first turn, table is empty and we can not compare, go to next turn.
+#          if @table.length is 1
+#            log += "puts <i class='badge badge-info'>" + card.htmlIcon + " "+(card.points+1)+"</i> " + card.name
+#            @otherPlayer = @playerActive
+#            continue
+#          else
+#
+#            # determine winner
+#            # update players scores
+#            log += "adds a <i class='badge badge-info'>" + card.htmlIcon + " "+(card.points+1)+"</i> " + card.name
+#
+#            # compare value of cards
+#            # draw case
+#            if card.points is @table[0].points
+#              log += "<br> <div class='alert alert-"+"default'>OMG! a draw!</div> "
+#              activeGuy.score++
+#              @players[@otherPlayer].score++
+# 
+#            else
+#              # current player wins
+#              if card.points > @table[0].points
+#                activeGuy.score++
+#                log += "<br> <div class='alert alert-success'>and "+activeGuy.name+" wins! booyah!</div>  "
+#                @deck.distribute(@players[@otherPlayer], 1)
+#                log += "<br> <div class='alert alert-info'>"+@players[@otherPlayer].name+" picks a new card from the deck, he has now "+@players[@otherPlayer].cards.length+"</div> "
+#              else
+#                # current player loses
+#                @players[@otherPlayer].score++
+#                @deck.distribute(activeGuy, 1)
+#                log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH! <br/>He picks a card.</div> "
+#            # empty table, put cards to grave
+#            @table = []
+#        else
+#          log += "<br> <div class='alert alert-success'><h1> "+activeGuy.name+" WONS the game! He has no cards anymore.</h1></div> "
+#          $("#log").append("<br> <h2>Game Over</h2> ")
+#          activeGuy.victory++
+#          tempCounter = i
+#          @refreshView tempCounter, @players, "vainqueur"+log
+#          i = @maxTurns
+#          console.log i,@maxTurns
+#          break
+#        i++
+#        log += "player " + activeGuy.name + ") "
+#        
+#        
+#          
+##        $("#log").prepend("<br> pas de vainqueur a la fin des tours")
+#        tempCounter = i
+#        @refreshView tempCounter, @players, "normal"+log
+    # put a card in the table array
+    # and return 
+    @putCardToTable = (card)->
+      @table.push card
+      @table.length
     # fight between two players
     # returns the winner
     @fight = (p1 , p2)->

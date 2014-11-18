@@ -17,5 +17,13 @@ $(function() {
   dealer = new d.dealer(players, deck);
   deck.shuffle();
   deck.distributeAll(players, 10);
+  $("body").on("click", "#input-choice .card", function() {
+    var cardId, name, self;
+    self = $(this);
+    name = self.attr("data-playerid");
+    cardId = self.attr("data-id");
+    console.log(this);
+    console.log('le joueur ' + name + ' pose la carte ' + self.html());
+  });
   return dealer.play();
 });

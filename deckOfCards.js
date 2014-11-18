@@ -172,65 +172,44 @@ $(function() {
     this.players = players;
     this.deck = deck;
     this.maxTurns = 10;
+    this.turn = 0;
     this.playerToStart = 0;
     this.playerActive = 0;
     this.table = [];
     this.otherPlayer = {};
+    this.askInput = function() {
+      var cards, choice;
+      console.log('en attente du joueur');
+      this.activeGuy = this.players[this.playerActive];
+      $('#input-instructions').html('play a card with a high value');
+      cards = this.activeGuy.cards;
+      choice = '';
+      choice = this.cards2html(cards);
+      return $('#input-choice').html(choice);
+    };
+    this.cards2html = function(cards) {
+      var c, listing, _i, _len;
+      listing = '';
+      for (_i = 0, _len = cards.length; _i < _len; _i++) {
+        c = cards[_i];
+        listing += '<button class="card col-lg-1" data-id="' + c.id + ' data-playerid="' + this.activeGuy.id + '">' + c.name + '</button>';
+      }
+      return listing;
+    };
+    this.interactionsJQ = function() {};
+    this.oneTurn = function() {
+      this.askInput();
+      return this.interactionsJQ();
+    };
     this.play = function() {
-      var activeGuy, card, i, log, tempCounter, _results;
+      var i, log;
       log = "";
       i = 1;
-      _results = [];
-      while (i <= this.maxTurns) {
-        log += "<br>Turn " + i + ") ";
-        this.setActivePlayer();
-        activeGuy = this.players[this.playerActive];
-        i++;
-        log += "player " + activeGuy.name + ") ";
-        if (activeGuy.hasCards()) {
-          console.log(activeGuy.cards.length + " cards");
-          card = activeGuy.cards.pop();
-          card.ownerId = activeGuy.id;
-          console.log(activeGuy.cards.length + " cards");
-          this.table.push(card);
-          if (this.table.length === 1) {
-            log += "puts <i class='badge badge-info'>" + card.htmlIcon + " " + (card.points + 1) + "</i> " + card.name;
-            this.otherPlayer = this.playerActive;
-            continue;
-          } else {
-            log += "adds a <i class='badge badge-info'>" + card.htmlIcon + " " + (card.points + 1) + "</i> " + card.name;
-            if (card.points === this.table[0].points) {
-              log += "<br> <div class='alert alert-" + "default'>OMG! a draw!</div> ";
-              activeGuy.score++;
-              this.players[this.otherPlayer].score++;
-            } else {
-              if (card.points > this.table[0].points) {
-                activeGuy.score++;
-                log += "<br> <div class='alert alert-success'>and " + activeGuy.name + " wins! booyah!</div>  ";
-                this.deck.distribute(this.players[this.otherPlayer], 1);
-                log += "<br> <div class='alert alert-info'>" + this.players[this.otherPlayer].name + " picks a new card from the deck, he has now " + this.players[this.otherPlayer].cards.length + "</div> ";
-              } else {
-                this.players[this.otherPlayer].score++;
-                this.deck.distribute(activeGuy, 1);
-                log += "<br> <div class='alert alert-warning'>and he is a big loser! BOOOOOH! <br/>He picks a card.</div> ";
-              }
-            }
-            this.table = [];
-          }
-        } else {
-          log += "<br> <div class='alert alert-success'><h1> " + activeGuy.name + " WONS the game! He has no cards anymore.</h1></div> ";
-          $("#log").append("<br> <h2>Game Over</h2> ");
-          activeGuy.victory++;
-          tempCounter = i;
-          this.refreshView(tempCounter, this.players, "vainqueur" + log);
-          i = this.maxTurns;
-          console.log(i, this.maxTurns);
-          break;
-        }
-        tempCounter = i;
-        _results.push(this.refreshView(tempCounter, this.players, "normal" + log));
-      }
-      return _results;
+      return this.oneTurn();
+    };
+    this.putCardToTable = function(card) {
+      this.table.push(card);
+      return this.table.length;
     };
     this.fight = function(p1, p2) {};
     this.setActivePlayer = function() {
