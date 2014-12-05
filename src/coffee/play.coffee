@@ -1,7 +1,7 @@
 $ ->
   $('#state').html('sparti')
 #  init the game components
-  d = new deckOfCards()
+  d = new $tk.deckOfCards()
   deck = new d.deck()
   players = [
     new d.player(
@@ -20,5 +20,8 @@ $ ->
   dealer = new d.dealer(players, deck)
   deck.shuffle()
   deck.distributeAll players, 10
-#  dealer.play()
-#$('#input-choice button')[0].click()
+  dealer.play()
+  console.log "play started"
+  autoClick = ()->
+    $('#input-choice button')[0].click()
+#  setTimeout autoClick(), 1000

@@ -32,8 +32,8 @@ $ ->
     # tells how the deck is.
     @health = ->
       blah = "i am a deck having " + @cards.length + " cards."
-
       blah
+      
     @tellCards = ->
       i = 0
       while i < @cards.length
@@ -98,13 +98,13 @@ $ ->
     @upPlayers = ()->
       for p in @players
         $('#player-'+p.id).html('<strong>'+p.name+'</strong> '+p.cards.length+' cartes')
+      console.log('vue mise a jour')
     # remove one card 
     @removeCard = (card) ->
       cardid = 12
       exitedCard = @cards.pop(cardid)
       @graveyard.push exitedCard
       return
-
     
     # remove one card 
     @addCard = (card) ->
@@ -161,7 +161,7 @@ $ ->
       if @victory
         text = "<div class='alert-success alert'>"+content+"</div>"
       text
-
+  
     for attrname of config
       this[attrname] = config[attrname]
     this
@@ -187,7 +187,7 @@ $ ->
       @setState('statoi de jouer, '+@players[@playerActive].name)
       @activeGuy = @players[@playerActive];
       $('#input-instructions').html('play a card with a high value')
-#      list the cards of the player.
+      #      list the cards of the player.
       cards = []
       if @activeGuy
         cards = @activeGuy.cards
@@ -195,65 +195,105 @@ $ ->
       choice = @cards2html(cards)
       $('#input-choice').html(choice)
       
-  @setState = (text)->
-    $('#state').html(text)
-    
-  @cards2html = (cards)->
-    listing = ''
-    for c in cards  
-      guyId = parseInt(@playerActive)
-      listing += '<button class="card col-lg-1" data-id="'+c.id+'" data-playerid="'+guyId+'">'+c.name+'</button>'
-    listing
-    
-  @interactionsJQ = ->
-    dealer = @
-    $("body").on("click", "#input-choice .card", (e, dealer)->
-    @activeGuy = @players[@playerActive]
-      self = $(@)
-      name = self.attr("data-playerid")
-      cardId = self.attr("data-id")
-#      console.log dealer.activeGuy
-#      console.log @activeGuy.cards[cardId]
-#       @.putCardToTable( @cards[cardId])
-  #   console.log('le joueur '+name+' pose la carte '+self.html())
-    )
-  @oneTurn = ->
-    @askInput()
-    @interactionsJQ()
-      
-  # run all the turns
-  @play = ->
-    log = ""
-    i = 1
-    @oneTurn()
-  # put a card in the table array
-  # and return 
-  @putCardToTable = (card)->
-    @table.push card
-    @table.length
-  # fight between two players
-  # returns the winner
-  @fight = (p1 , p2)->
-    #TODO
-      
-  # set who's turn it is to play
-  @setActivePlayer = ->
-    @playerActive++
-    @playerActive = 0  if @playerActive >= players.length
+    @setState = (text)->
+      $('#state').html(text)
 
-  @refreshView = (tempCount, players, log) ->
-    status = deck.health()
-    $("#state").html status
-    text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>"
-    $("#log").append " <h2>tour "+tempCount+"</h2> "+text
-    tempCount = 0
-    while tempCount < @players.length
-      $("#player-" + tempCount).html players[tempCount].status()
-      tempCount++
+    @cards2html = (cards)->
+      listing = ''
+      for c in cards  
+        guyId = parseInt(@playerActive)
+        listing += '<button class="card col-lg-1" data-id="'+c.id+'" data-playerid="'+guyId+'">'+c.name+'</button>'
+      listing
+
+    @interactionsJQ = ->
+      window.$tk.theDealer = @
+      $("body").on("click", "#input-choice .card", (e, dealer)->
+        # "this" becomes the clicked button
+        self = $(@)
+        d= window.$tk.theDealer
+        name = self.attr("data-playerid")
+        cardId = self.attr("data-id")
+        self.fadeOut()
+        card = d.idToCard( cardId , d.activeGuy.cards )
+        d.putCardToTable(card)
+      )
       
+    @nextTurn = ->
+      @setActivePlayer
+      
+      @askInput()
+      
+    @oneTurn = ->
+      @askInput()
+      @interactionsJQ()
+      
+    # check for cards of a player,
+    # remove the one we are looking for and return it
+    # needle is the id of the card
+    # haystack is the card array
+    @idToCard = (needle, haystack)->
+      needle = parseInt(needle)
+      console.log('we are looking for an id of', needle)
+      i = 0
+      for c in haystack
+        #        console.log('card tested', c.id)
+        if (c.id == needle)
+          console.log('card found')
+          return c
+      console.log('card '+needle+' not found')
+      i++
+      
+    @idToHandId = (needle, haystack)->
+      needle = parseInt(needle)
+      console.log('we are looking for an id of', needle, haystack)
+      i = 0
+      for c in haystack
+        if (c.id == needle)
+          return i
+        i++
         
-    text
-  this
+    # run all the turns
+    @play = ->
+      console.log 'play sparti'
+      log = ""
+      i = 1
+      @oneTurn()
+    # put a card in the table array
+    # and return 
+    @putCardToTable = (card)->
+      # remove the card from active player's hand
+      res = @idToHandId(card.id, @activeGuy.cards)
+      console.log('id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
+      @activeGuy.cards.pop res
+      console.log('le joueur '+@activeGuy.name+' pose la carte '+card.name)
+      @table.push card
+      console.log('mise a jour des joueurs')
+      @refreshView('hop')
+    # fight between two players
+    # returns the winner
+    @fight = (p1 , p2)->
+      #TODO
+
+    # set who's turn it is to play
+    @setActivePlayer = ->
+      @playerActive++
+      @playerActive = 0  if @playerActive >= players.length
+      @activeGuy = @players[@playerActive]
+
+    @refreshView = (log) ->
+      players = @players
+      status = deck.health()
+      
+      $("#table").html @cards2html(@table)
+      $("#state").html status
+      text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>"
+      $("#log").append " <h2>tour "+@turn+"</h2> "+text
+      tempCount = 0
+      while tempCount < @players.length
+        $("#player-" + tempCount).html players[tempCount].status()
+        tempCount++
+      text
+    this
     
   deckOfCards = ->
     deck : Deck
@@ -264,3 +304,4 @@ $ ->
   
   console.log "deckOfCards is ready!"
   window.deckOfCards = deckOfCards
+  window.$tk = $tk

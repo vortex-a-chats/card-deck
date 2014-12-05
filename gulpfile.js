@@ -11,7 +11,7 @@ var reload = browserSync.reload;
 
 var sources ={
   sass : "src/sass/*.scss",
-  html : "src/html/app.html",
+  html : "src/html/*.html",
   coffee : "src/coffee/*.coffee"
 };
 var destinations ={

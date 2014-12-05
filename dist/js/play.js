@@ -1,8 +1,8 @@
 (function() {
   $(function() {
-    var d, dealer, deck, players;
+    var autoClick, d, dealer, deck, players;
     $('#state').html('sparti');
-    d = new deckOfCards();
+    d = new $tk.deckOfCards();
     deck = new d.deck();
     players = [
       new d.player({
@@ -18,7 +18,12 @@
     ];
     dealer = new d.dealer(players, deck);
     deck.shuffle();
-    return deck.distributeAll(players, 10);
+    deck.distributeAll(players, 10);
+    dealer.play();
+    console.log("play started");
+    return autoClick = function() {
+      return $('#input-choice button')[0].click();
+    };
   });
 
 }).call(this);
