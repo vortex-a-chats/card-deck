@@ -76,10 +76,14 @@
         return i;
       };
       this.distributeAll = function(players, int) {
-        var i, j, oneCard;
+        var i, j, oneCard, player;
+        console.log('le deck avait ' + this.cards.length + ' cartes');
+        this.players = players;
         i = 0;
         while (i < players.length) {
           if (typeof players[i] !== undefined) {
+            player = players[i];
+            console.log('distribution de ' + int + ' cartes à ' + player.name);
             j = 0;
             while (j < int) {
               oneCard = this.cards.pop();
@@ -87,11 +91,23 @@
               players[i].cards.push(oneCard);
               j++;
             }
+            console.log('    il a maintenant ' + player.cards.length + ' cartes');
           }
           i++;
         }
         this.hasDistributed = 1;
+        this.upPlayers();
         return true;
+      };
+      this.upPlayers = function() {
+        var p, _i, _len, _ref, _results;
+        _ref = this.players;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          p = _ref[_i];
+          _results.push($('#player-' + p.id).html('<strong>' + p.name + '</strong> ' + p.cards.length + ' cartes'));
+        }
+        return _results;
       };
       this.removeCard = function(card) {
         var cardid, exitedCard;
@@ -176,74 +192,77 @@
       this.turn = 0;
       this.playerToStart = 0;
       this.playerActive = 0;
+      this.activeGuy = this.players[this.playerActive];
       this.table = [];
       this.otherPlayer = {};
-      this.askInput = function() {
+      return this.askInput = function() {
         var cards, choice;
-        console.log('en attente du joueur');
+        console.log('en attente du joueur: ' + this.players[this.playerActive].name);
+        this.setState('statoi de jouer, ' + this.players[this.playerActive].name);
         this.activeGuy = this.players[this.playerActive];
         $('#input-instructions').html('play a card with a high value');
-        cards = this.activeGuy.cards;
+        cards = [];
+        if (this.activeGuy) {
+          cards = this.activeGuy.cards;
+        }
         choice = '';
         choice = this.cards2html(cards);
         return $('#input-choice').html(choice);
       };
-      this.cards2html = function(cards) {
-        var c, listing, _i, _len;
-        listing = '';
-        for (_i = 0, _len = cards.length; _i < _len; _i++) {
-          c = cards[_i];
-          listing += '<button class="card col-lg-1" data-id="' + c.id + ' data-playerid="' + this.activeGuy.id + '">' + c.name + '</button>';
-        }
-        return listing;
-      };
-      this.interactionsJQ = function() {
-        var dealer;
-        dealer = this;
-        return $("body").on("click", "#input-choice .card", function(dealer) {
-          var cardId, name, self;
-          self = $(this);
-          name = self.attr("data-playerid");
-          cardId = self.attr("data-id");
-          return console.log(dealer);
-        });
-      };
-      this.oneTurn = function() {
-        this.askInput();
-        return this.interactionsJQ();
-      };
-      this.play = function() {
-        var i, log;
-        log = "";
-        i = 1;
-        return this.oneTurn();
-      };
-      this.putCardToTable = function(card) {
-        this.table.push(card);
-        return this.table.length;
-      };
-      this.fight = function(p1, p2) {};
-      this.setActivePlayer = function() {
-        this.playerActive++;
-        if (this.playerActive >= players.length) {
-          return this.playerActive = 0;
-        }
-      };
-      this.refreshView = function(tempCount, players, log) {
-        var status, text;
-        status = deck.health();
-        $("#state").html(status);
-        text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>";
-        $("#log").append(" <h2>tour " + tempCount + "</h2> " + text);
-        tempCount = 0;
-        while (tempCount < this.players.length) {
-          $("#player-" + tempCount).html(players[tempCount].status());
-          tempCount++;
-        }
-        return text;
-      };
-      return this;
     };
+    this.setState = function(text) {
+      return $('#state').html(text);
+    };
+    this.cards2html = function(cards) {
+      var c, guyId, listing, _i, _len;
+      listing = '';
+      for (_i = 0, _len = cards.length; _i < _len; _i++) {
+        c = cards[_i];
+        guyId = parseInt(this.playerActive);
+        listing += '<button class="card col-lg-1" data-id="' + c.id + '" data-playerid="' + guyId + '">' + c.name + '</button>';
+      }
+      return listing;
+    };
+    this.interactionsJQ = function() {
+      var cardId, dealer, name, self;
+      dealer = this;
+      return $("body").on("click", "#input-choice .card", function(e, dealer) {}, this.activeGuy = this.players[this.playerActive], self = $(this), name = self.attr("data-playerid"), cardId = self.attr("data-id"));
+    };
+    this.oneTurn = function() {
+      this.askInput();
+      return this.interactionsJQ();
+    };
+    this.play = function() {
+      var i, log;
+      log = "";
+      i = 1;
+      return this.oneTurn();
+    };
+    this.putCardToTable = function(card) {
+      this.table.push(card);
+      return this.table.length;
+    };
+    this.fight = function(p1, p2) {};
+    this.setActivePlayer = function() {
+      this.playerActive++;
+      if (this.playerActive >= players.length) {
+        return this.playerActive = 0;
+      }
+    };
+    this.refreshView = function(tempCount, players, log) {
+      var status, text;
+      status = deck.health();
+      $("#state").html(status);
+      text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>";
+      $("#log").append(" <h2>tour " + tempCount + "</h2> " + text);
+      tempCount = 0;
+      while (tempCount < this.players.length) {
+        $("#player-" + tempCount).html(players[tempCount].status());
+        tempCount++;
+      }
+      return text;
+    };
+    this;
     deckOfCards = function() {
       return {
         deck: Deck,

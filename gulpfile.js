@@ -11,13 +11,13 @@ var reload = browserSync.reload;
 
 var sources ={
   sass : "src/sass/*.scss",
-  html : "src/html/*.html",
+  html : "src/html/app.html",
   coffee : "src/coffee/*.coffee"
 };
 var destinations ={
-  sass : "dist/sass/*.scss",
-  html : "dist/html/*.html",
-  coffee : "dist/coffee/*.coffee"
+  sass : "dist/sass/",
+  html : "dist/html/",
+  coffee : "dist/coffee/"
 };
 
 gulp.task("styles", function () {
@@ -54,6 +54,7 @@ gulp.task("sass2css", function () {
 gulp.task("coffee2js", function () {
   gulp.src("./src/coffee/*.coffee")
           .pipe(coffee())
+          .pipe(plumber())
           .pipe(gulp.dest("./dist/js/"))
           .pipe(reload({stream: true}))
 });

@@ -20,4 +20,5 @@ $ ->
   dealer = new d.dealer(players, deck)
   deck.shuffle()
   deck.distributeAll players, 10
-  dealer.play()
+#  dealer.play()
+#$('#input-choice button')[0].click()

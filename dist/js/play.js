@@ -18,8 +18,7 @@
     ];
     dealer = new d.dealer(players, deck);
     deck.shuffle();
-    deck.distributeAll(players, 10);
-    return dealer.play();
+    return deck.distributeAll(players, 10);
   });
 
 }).call(this);

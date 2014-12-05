@@ -71,25 +71,33 @@ $ ->
         i++
       @hasDistributed = 1
       console.log  player.name+' (qui a '+player.cards.length+' cartes)'
-      i
+      i # return the number of cards distributed
       
     
     # distribute an equal number of cards to all the players
     @distributeAll = (players, int) ->
+      console.log 'le deck avait '+@cards.length+' cartes'
+      @players = players
       i = 0
       while i < players.length
         if typeof (players[i]) isnt `undefined`
+          player = players[i]
+          console.log 'distribution de '+int+' cartes à '+player.name
           j = 0
           while j < int
             oneCard = @cards.pop()
             oneCard.ownerId = i
             players[i].cards.push oneCard
             j++
+          console.log '    il a maintenant '+player.cards.length+' cartes'
         i++
       @hasDistributed = 1
+      @upPlayers()
       true
-
-    
+    #show players in the view
+    @upPlayers = ()->
+      for p in @players
+        $('#player-'+p.id).html('<strong>'+p.name+'</strong> '+p.cards.length+' cartes')
     # remove one card 
     @removeCard = (card) ->
       cardid = 12
@@ -170,75 +178,82 @@ $ ->
     @turn = 0
     @playerToStart = 0
     @playerActive = 0
+    @activeGuy = @players[@playerActive]
     @table = [] # place where cards are shown to everyone
     @otherPlayer = {} # player to compare scores with
     # ask active player to do something
     @askInput = ->
-      console.log('en attente du joueur')
+      console.log('en attente du joueur: '+@players[@playerActive].name)
+      @setState('statoi de jouer, '+@players[@playerActive].name)
       @activeGuy = @players[@playerActive];
       $('#input-instructions').html('play a card with a high value')
-      #list the cards of the player.
-      cards = @activeGuy.cards
+#      list the cards of the player.
+      cards = []
+      if @activeGuy
+        cards = @activeGuy.cards
       choice = ''
       choice = @cards2html(cards)
       $('#input-choice').html(choice)
       
+  @setState = (text)->
+    $('#state').html(text)
     
+  @cards2html = (cards)->
+    listing = ''
+    for c in cards  
+      guyId = parseInt(@playerActive)
+      listing += '<button class="card col-lg-1" data-id="'+c.id+'" data-playerid="'+guyId+'">'+c.name+'</button>'
+    listing
     
-    @cards2html = (cards)->
-      listing = ''
-      for c in cards  
-        listing += '<button class="card col-lg-1" data-id="'+c.id+' data-playerid="'+@activeGuy.id+'">'+c.name+'</button>'
-      listing
-    
-    @interactionsJQ = ->
-      dealer = @
-      $("body").on("click", "#input-choice .card", (dealer)->
-        self = $(@)
-        name = self.attr("data-playerid")
-        cardId = self.attr("data-id")
-        console.log dealer
-    #        console.log @activeGuy.cards[cardId]
-#      @.putCardToTable( @cards[cardId])
-    #  console.log('le joueur '+name+' pose la carte '+self.html())
-      )
-    @oneTurn = ->
-      @askInput()
-      @interactionsJQ()
+  @interactionsJQ = ->
+    dealer = @
+    $("body").on("click", "#input-choice .card", (e, dealer)->
+    @activeGuy = @players[@playerActive]
+      self = $(@)
+      name = self.attr("data-playerid")
+      cardId = self.attr("data-id")
+#      console.log dealer.activeGuy
+#      console.log @activeGuy.cards[cardId]
+#       @.putCardToTable( @cards[cardId])
+  #   console.log('le joueur '+name+' pose la carte '+self.html())
+    )
+  @oneTurn = ->
+    @askInput()
+    @interactionsJQ()
       
-    # run all the turns
-    @play = ->
-      log = ""
-      i = 1
-      @oneTurn()
-    # put a card in the table array
-    # and return 
-    @putCardToTable = (card)->
-      @table.push card
-      @table.length
-    # fight between two players
-    # returns the winner
-    @fight = (p1 , p2)->
-      #TODO
+  # run all the turns
+  @play = ->
+    log = ""
+    i = 1
+    @oneTurn()
+  # put a card in the table array
+  # and return 
+  @putCardToTable = (card)->
+    @table.push card
+    @table.length
+  # fight between two players
+  # returns the winner
+  @fight = (p1 , p2)->
+    #TODO
       
-    # set who's turn it is to play
-    @setActivePlayer = ->
-      @playerActive++
-      @playerActive = 0  if @playerActive >= players.length
+  # set who's turn it is to play
+  @setActivePlayer = ->
+    @playerActive++
+    @playerActive = 0  if @playerActive >= players.length
 
-    @refreshView = (tempCount, players, log) ->
-      status = deck.health()
-      $("#state").html status
-      text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>"
-      $("#log").append " <h2>tour "+tempCount+"</h2> "+text
-      tempCount = 0
-      while tempCount < @players.length
-        $("#player-" + tempCount).html players[tempCount].status()
-        tempCount++
+  @refreshView = (tempCount, players, log) ->
+    status = deck.health()
+    $("#state").html status
+    text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>"
+    $("#log").append " <h2>tour "+tempCount+"</h2> "+text
+    tempCount = 0
+    while tempCount < @players.length
+      $("#player-" + tempCount).html players[tempCount].status()
+      tempCount++
       
         
-      text
-    this
+    text
+  this
     
   deckOfCards = ->
     deck : Deck
