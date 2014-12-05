@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+  <head>
+    <title>TK deck of cards</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <h2>état du jeu:<i class="fa fa-gear"></i></h2>
+      <a class="btn btn-primary" href="http://artlemoine.com">mon portfolio</a>
+      <div class="Well">
+        <h1>
+          Un jeu de cartes en Javascript. Merveilleux!!!!!!
+        </h1>
+      </div>
+      <section>
+        <div id="input-instructions" class="well text-info">
+
+        </div>
+        <div id="input-choice" class="well row">
+
+        </div>
+      </section>
+      <section>
+        <h2>joueurs: <i class="fa fa-user"></i></h2>
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="row">
+              <div id="player-0" class="col-lg-6 well"></div>
+              <div id="player-1" class="col-lg-6 well"></div>
+              <div id="player-2" class="col-lg-6 well"></div>
+              <div id="player-3" class="col-lg-6 well"></div>
+            </div>
+            <div class="row">
+
+
+              <div id="state" class="col-lg-4 well"></div>
+              <div id="display" class="col-lg-8">
+                <div class="jumbotron">Sparti!</div>
+                Nos gaillards jouent tour à tour à qui aura le plus de puissance.
+                <section id="rules">
+                  <h2>Règles du jeu</h2>
+                  <ul>
+                    <li>
+                      Tour à tour, chaque joueur pose une carte sur la table.
+                    </li>
+                    <li>
+                      Le joueur compare la valeur de sa carte avec la carte posée précédemment.
+                    </li>
+                    <li>
+                      La valeur la plus élevée fait gagner un point à son joueur.
+                    </li>
+                    <li>
+                      Une égalité fait gagner un point aux deux joueurs.
+                    </li>
+                    <li>
+                      Le perdant pioche une carte
+                    </li>
+                    <li>
+                      Si un joueur n'a plus de cartes, il gagne.
+                    </li>
+                  </ul>
+                </section>
+
+              </div>
+
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div id="log"></div>
+          </div>
+
+        </div>
+
+      </section>
+    </div>
+    <script type="text/javascript" src='//code.jquery.com/jquery-1.11.1.min.js'></script>
+    <script type="text/javascript" src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js'></script>
+    <script type="text/javascript" src='js/deckOfCards.js'></script>
+    <script type="text/javascript" src='js/play.js'></script>
+  </body>
+</html>
