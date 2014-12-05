@@ -20,7 +20,7 @@
     deck.shuffle();
     deck.distributeAll(players, 10);
     dealer.play();
-    console.log("play started");
+    dealer.log("play started");
     return autoClick = function() {
       return $('#input-choice button')[0].click();
     };

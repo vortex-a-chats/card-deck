@@ -7,6 +7,7 @@ $ ->
     new d.player(
       id: 0
       name: "bob"
+#      type: "true-player"
     ),
     new d.player(
       id: 1
@@ -21,7 +22,7 @@ $ ->
   deck.shuffle()
   deck.distributeAll players, 10
   dealer.play()
-  console.log "play started"
+  dealer.log "play started"
   autoClick = ()->
     $('#input-choice button')[0].click()
 #  setTimeout autoClick(), 1000

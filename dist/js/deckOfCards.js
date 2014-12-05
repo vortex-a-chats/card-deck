@@ -158,6 +158,7 @@
       this.score = 0;
       this.victory = 0;
       this.turnId = "";
+      this.type = "NPC";
       this.hasCards = function() {
         if (this.cards.length > 0) {
           return true;
@@ -191,6 +192,9 @@
       this.turn = 0;
       this.playerToStart = 0;
       this.playerActive = 0;
+      this.config = {
+        autoplay: 0
+      };
       this.activeGuy = this.players[this.playerActive];
       this.graveyard = [];
       this.table = [];
@@ -198,8 +202,6 @@
       this.askInput = function() {
         var activeName, cards, choice;
         activeName = this.players[this.playerActive].name;
-        console.log('en attente du joueur: ' + activeName);
-        this.setState('statoi de jouer, ' + activeName);
         this.activeGuy = this.players[this.playerActive];
         $('#input-instructions').html('play a card with a high value');
         cards = [];
@@ -208,7 +210,9 @@
         }
         choice = '';
         choice = this.cards2html(cards);
-        return $('#input-choice').html(choice);
+        $('#input-choice').html(choice);
+        console.log('en attente du joueur: ' + activeName);
+        return this.setState('statoi de jouer, ' + activeName);
       };
       this.setState = function(text) {
         return $('#state').html(text);
@@ -231,9 +235,11 @@
           d = window.$tk.theDealer;
           name = self.attr("data-playerid");
           cardId = self.attr("data-id");
-          self.fadeOut();
           card = d.idToCard(cardId, d.activeGuy.cards);
-          return d.putCardToTable(card);
+          if (card) {
+            d.putCardToTable(card);
+            return self.fadeOut();
+          }
         });
       };
       this.emptyTable = function() {
@@ -248,6 +254,7 @@
       };
       this.nextTurn = function() {
         var fightResult;
+        this.turn++;
         if (this.table.length === 2) {
           console.log('début de l\'affrontement sur table!');
           fightResult = this.tableFight();
@@ -257,13 +264,52 @@
             console.log('égalité!');
           } else {
             this.players[fightResult].score++;
-            console.log(this.players[fightResult].name + ' a gagné le match!');
+            this.players[fightResult].score++;
+            this.log(this.players[fightResult].name + ' a gagné le match!');
           }
           this.emptyTable();
         }
-        this.setActivePlayer();
-        this.refreshView();
-        return this.askInput();
+        console.log(this.maxTurns, this.turn);
+        if (this.maxTurns < this.turn) {
+          return this.gameOver();
+        }
+        return this.isItFinished();
+      };
+      this.isItFinished = function() {
+        if (this.activeGuy.cards.length === 0) {
+          return this.winning();
+        } else {
+          this.setActivePlayer();
+          this.refreshView();
+          if (this.config.autoplay) {
+            if (this.activeGuy.type === "NPC") {
+              return this.autoplay();
+            } else {
+              return this.askInput();
+            }
+          } else {
+            return this.askInput();
+          }
+        }
+      };
+      this.gameOver = function() {
+        this.log(' maximum turns reached, game over');
+        $("body").off("click", "#input-choice .card");
+        return $("#input-choice button").disable();
+      };
+      this.autoplay = function() {
+        var card;
+        this.log(this.activeGuy.name + ' plays');
+        card = this.activeGuy.cards.pop(0);
+        this.putCardToTable(card);
+        return this.nextTurn();
+      };
+      this.winning = function() {
+        var txt;
+        txt = 'le joueur ' + this.activeGuy.name + ' est vainqueur!';
+        console.log(txt);
+        this.log(txt);
+        return $("#state").html(txt);
       };
       this.oneTurn = function() {
         this.askInput();
@@ -276,22 +322,21 @@
         i = 0;
         for (_i = 0, _len = haystack.length; _i < _len; _i++) {
           c = haystack[_i];
-          if (c.id === needle) {
+          if (parseInt(c.id) === needle) {
             console.log('card found');
             return c;
           }
         }
-        console.log('card ' + needle + ' not found');
+        console.log('card ' + needle + ' NOT found');
         return i++;
       };
       this.idToHandId = function(needle, haystack) {
         var c, i, _i, _len;
         needle = parseInt(needle);
-        console.log('we are looking for an id of', needle, haystack);
         i = 0;
         for (_i = 0, _len = haystack.length; _i < _len; _i++) {
           c = haystack[_i];
-          if (c.id === needle) {
+          if (parseInt(c.id) === needle) {
             return i;
           }
           i++;
@@ -307,12 +352,11 @@
       this.putCardToTable = function(card) {
         var res;
         res = this.idToHandId(card.id, this.activeGuy.cards);
-        console.log('id de la carte à enlever de la main du joueur: ', res, this.activeGuy.cards[res]);
         this.activeGuy.cards.pop(res);
-        console.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
+        this.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
         this.table.push(card);
         console.log('mise a jour des joueurs');
-        this.refreshView('hop');
+        this.refreshView();
         return this.nextTurn();
       };
       this.tableFight = function() {
@@ -326,7 +370,6 @@
           }
         }
       };
-      this.fight = function(p1, p2) {};
       this.setActivePlayer = function() {
         this.playerActive++;
         if (this.playerActive >= players.length) {
@@ -334,20 +377,28 @@
         }
         return this.activeGuy = this.players[this.playerActive];
       };
-      this.refreshView = function(log) {
-        var status, tempCount, text;
+      this.log = function(text) {
+        if (this.turn !== this.lastTurn) {
+          text = " <h2>tour " + this.turn + "</h2> " + text;
+        }
+        text = "<div class=\"bs-callin bs-callin-info\"><p>" + text + "</p></div>";
+        $("#log").append(text);
+        return this.lastTurn = this.turn;
+      };
+      this.refreshView = function() {
+        var status, tempCount, _results;
         players = this.players;
         status = deck.health();
         $("#table").html(this.cards2html(this.table));
         $("#state").html(status);
-        text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>";
-        $("#log").append(" <h2>tour " + this.turn + "</h2> " + text);
+        $("#graveyard").html(this.cards2html(this.graveyard));
         tempCount = 0;
+        _results = [];
         while (tempCount < this.players.length) {
           $("#player-" + tempCount).html(players[tempCount].status());
-          tempCount++;
+          _results.push(tempCount++);
         }
-        return text;
+        return _results;
       };
       return this;
     };

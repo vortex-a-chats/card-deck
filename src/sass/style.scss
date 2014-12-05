@@ -1,9 +1,20 @@
+$main-color : rgb(49, 112, 143);
+
 body{
   background: black;
   font-family: 'Gill Sans', Calibri, Arial;
-  color: rgb(49, 112, 143);
+  color: $main-color;
 }
 .well{
   background: #012;
   border: 0;
+}
+#log{
+  height: 200px;
+  overflow: scroll;
+  overflow-x: hidden;
+  margin: 1em 0;
+  border: solid 1px $main-color;
+  padding: 1em;
+  
 }

@@ -151,6 +151,7 @@ $ ->
     @score = 0
     @victory = 0
     @turnId = ""
+    @type = "NPC" # Non playing character or true player
     @hasCards = ->
       return true  if @cards.length > 0
       false
@@ -178,6 +179,8 @@ $ ->
     @turn = 0
     @playerToStart = 0
     @playerActive = 0
+    @config = 
+      autoplay : 0
     @activeGuy = @players[@playerActive]
     @graveyard = [] # place where cards go when out of the game. RIP.
     @table = [] # place where cards are shown to everyone
@@ -185,8 +188,7 @@ $ ->
     # ask active player to do something
     @askInput = ->
       activeName = @players[@playerActive].name
-      console.log('en attente du joueur: '+activeName)
-      @setState('statoi de jouer, '+activeName)
+      
       @activeGuy = @players[@playerActive];
       $('#input-instructions').html('play a card with a high value')
       #      list the cards of the player.
@@ -196,10 +198,14 @@ $ ->
       choice = ''
       choice = @cards2html(cards)
       $('#input-choice').html(choice)
-      
+      console.log('en attente du joueur: '+activeName)
+      @setState('statoi de jouer, '+activeName)
+    
+    #set a text in the state of the game
     @setState = (text)->
       $('#state').html(text)
-
+    
+    #render html view of a set of cards
     @cards2html = (cards)->
       listing = ''
       for c in cards  
@@ -215,10 +221,11 @@ $ ->
         d= window.$tk.theDealer
         name = self.attr("data-playerid")
         cardId = self.attr("data-id")
-        self.fadeOut()
         card = d.idToCard( cardId , d.activeGuy.cards )
-        d.putCardToTable(card)
-      )
+        if card
+          d.putCardToTable(card)
+          self.fadeOut()
+      ) 
     
     # put all cards of the table in the graveyard
     @emptyTable = ->
@@ -228,6 +235,7 @@ $ ->
       console.log('table is now empty')
       
     @nextTurn = ->
+      @turn++
       # take a fight of the cards only when there are 2 cards on the table
       if @table.length == 2
         console.log('début de l\'affrontement sur table!')
@@ -238,11 +246,50 @@ $ ->
           console.log('égalité!')
         else
           @players[fightResult].score++;
-          console.log(@players[fightResult].name+' a gagné le match!')
+          @players[fightResult].score++;
+          @log(@players[fightResult].name+' a gagné le match!')
         @emptyTable()
-      @setActivePlayer()
-      @refreshView()
-      @askInput()
+      console.log @maxTurns, @turn
+      if @maxTurns < @turn
+        return @gameOver()
+      @isItFinished()
+
+    
+    # check if the game is over
+    # has current player won and has no cards left in his hands ?
+    @isItFinished = ->
+      if @activeGuy.cards.length == 0
+        return @winning()
+      # continue game
+      else
+        @setActivePlayer()
+        @refreshView()
+        if @config.autoplay
+          if @activeGuy.type == "NPC"
+            @autoplay()
+          else
+            @askInput()
+        else
+          @askInput()
+          
+    #end of the game
+    @gameOver = ->
+      @log(' maximum turns reached, game over')
+      $("body").off("click", "#input-choice .card")
+      $("#input-choice button").disable()
+    # makes a non playing character play automatically
+    @autoplay = ->
+      @log(@activeGuy.name+' plays')
+      # a way to choose a card in the hand
+      card = @activeGuy.cards.pop(0);
+      @putCardToTable(card)
+      @nextTurn()
+      
+    @winning = ->
+      txt = 'le joueur '+@activeGuy.name+' est vainqueur!'
+      console.log(txt)
+      @log(txt)
+      $("#state").html txt
       
     @oneTurn = ->
       @askInput()
@@ -257,19 +304,19 @@ $ ->
       console.log('we are looking for an id of', needle)
       i = 0
       for c in haystack
-        #        console.log('card tested', c.id)
-        if (c.id == needle)
+#        console.log('card tested', c.id , needle , c.name)
+        if ( parseInt(c.id) == needle)
           console.log('card found')
           return c
-      console.log('card '+needle+' not found')
+      console.log('card '+needle+' NOT found')
       i++
-      
+    
     @idToHandId = (needle, haystack)->
       needle = parseInt(needle)
-      console.log('we are looking for an id of', needle, haystack)
+#      console.log('we are looking for an id of', needle, haystack)
       i = 0
       for c in haystack
-        if (c.id == needle)
+        if ( parseInt(c.id) == needle)
           return i
         i++
         
@@ -284,12 +331,12 @@ $ ->
     @putCardToTable = (card)->
       # remove the card from active player's hand
       res = @idToHandId(card.id, @activeGuy.cards)
-      console.log('id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
+      # console.log('id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
       @activeGuy.cards.pop res
-      console.log('le joueur '+@activeGuy.name+' pose la carte '+card.name)
+      @log('le joueur '+@activeGuy.name+' pose la carte '+card.name)
       @table.push card
       console.log('mise a jour des joueurs')
-      @refreshView('hop')
+      @refreshView()
       @nextTurn()
       
     # fight between two players
@@ -305,30 +352,30 @@ $ ->
         else
           return @table[1].ownerId 
 
-    # fight between two players
-    # returns the winner
-    @fight = (p1 , p2)->
-      #TODO
-
     # set who's turn it is to play
     @setActivePlayer = ->
       @playerActive++
       @playerActive = 0  if @playerActive >= players.length
       @activeGuy = @players[@playerActive]
 
-    @refreshView = (log) ->
+    @log = (text) ->
+      if @turn != @lastTurn
+        text = " <h2>tour "+@turn+"</h2> "+text
+      text = "<div class=\"bs-callin bs-callin-info\"><p>" + text + "</p></div>"
+      $("#log").append text
+      @lastTurn = @turn
+      
+    @refreshView = () ->
       players = @players
       status = deck.health()
-      
       $("#table").html @cards2html(@table)
       $("#state").html status
-      text = "<div class=\"bs-callin bs-callin-info\"><p>" + log + "</p></div>"
-      $("#log").append " <h2>tour "+@turn+"</h2> "+text
+      $("#graveyard").html @cards2html(@graveyard)
       tempCount = 0
       while tempCount < @players.length
         $("#player-" + tempCount).html players[tempCount].status()
         tempCount++
-      text
+      
     this
     
   deckOfCards = ->
