@@ -219,8 +219,7 @@ $ ->
       )
       
     @nextTurn = ->
-      @setActivePlayer
-      
+      @setActivePlayer()
       @askInput()
       
     @oneTurn = ->
@@ -269,6 +268,8 @@ $ ->
       @table.push card
       console.log('mise a jour des joueurs')
       @refreshView('hop')
+      @nextTurn()
+      
     # fight between two players
     # returns the winner
     @fight = (p1 , p2)->

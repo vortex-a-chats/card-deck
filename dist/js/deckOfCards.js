@@ -235,7 +235,7 @@
         });
       };
       this.nextTurn = function() {
-        this.setActivePlayer;
+        this.setActivePlayer();
         return this.askInput();
       };
       this.oneTurn = function() {
@@ -285,7 +285,8 @@
         console.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
         this.table.push(card);
         console.log('mise a jour des joueurs');
-        return this.refreshView('hop');
+        this.refreshView('hop');
+        return this.nextTurn();
       };
       this.fight = function(p1, p2) {};
       this.setActivePlayer = function() {
