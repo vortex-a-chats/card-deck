@@ -192,12 +192,14 @@
       this.playerToStart = 0;
       this.playerActive = 0;
       this.activeGuy = this.players[this.playerActive];
+      this.graveyard = [];
       this.table = [];
       this.otherPlayer = {};
       this.askInput = function() {
-        var cards, choice;
-        console.log('en attente du joueur: ' + this.players[this.playerActive].name);
-        this.setState('statoi de jouer, ' + this.players[this.playerActive].name);
+        var activeName, cards, choice;
+        activeName = this.players[this.playerActive].name;
+        console.log('en attente du joueur: ' + activeName);
+        this.setState('statoi de jouer, ' + activeName);
         this.activeGuy = this.players[this.playerActive];
         $('#input-instructions').html('play a card with a high value');
         cards = [];
@@ -234,8 +236,33 @@
           return d.putCardToTable(card);
         });
       };
+      this.emptyTable = function() {
+        var card, _i, _len, _ref;
+        _ref = this.table;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          card = _ref[_i];
+          this.graveyard.push(card);
+        }
+        this.table = [];
+        return console.log('table is now empty');
+      };
       this.nextTurn = function() {
+        var fightResult;
+        if (this.table.length === 2) {
+          console.log('début de l\'affrontement sur table!');
+          fightResult = this.tableFight();
+          if (fightResult === "equal") {
+            this.players[this.table[0].ownerId].score++;
+            this.players[this.table[1].ownerId].score++;
+            console.log('égalité!');
+          } else {
+            this.players[fightResult].score++;
+            console.log(this.players[fightResult].name + ' a gagné le match!');
+          }
+          this.emptyTable();
+        }
         this.setActivePlayer();
+        this.refreshView();
         return this.askInput();
       };
       this.oneTurn = function() {
@@ -287,6 +314,17 @@
         console.log('mise a jour des joueurs');
         this.refreshView('hop');
         return this.nextTurn();
+      };
+      this.tableFight = function() {
+        if (this.table[0].points === this.table[1].points) {
+          return "equal";
+        } else {
+          if (this.table[0].points > this.table[1].point) {
+            return this.table[0].ownerId;
+          } else {
+            return this.table[1].ownerId;
+          }
+        }
       };
       this.fight = function(p1, p2) {};
       this.setActivePlayer = function() {

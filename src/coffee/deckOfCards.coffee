@@ -179,12 +179,14 @@ $ ->
     @playerToStart = 0
     @playerActive = 0
     @activeGuy = @players[@playerActive]
+    @graveyard = [] # place where cards go when out of the game. RIP.
     @table = [] # place where cards are shown to everyone
     @otherPlayer = {} # player to compare scores with
     # ask active player to do something
     @askInput = ->
-      console.log('en attente du joueur: '+@players[@playerActive].name)
-      @setState('statoi de jouer, '+@players[@playerActive].name)
+      activeName = @players[@playerActive].name
+      console.log('en attente du joueur: '+activeName)
+      @setState('statoi de jouer, '+activeName)
       @activeGuy = @players[@playerActive];
       $('#input-instructions').html('play a card with a high value')
       #      list the cards of the player.
@@ -217,9 +219,29 @@ $ ->
         card = d.idToCard( cardId , d.activeGuy.cards )
         d.putCardToTable(card)
       )
+    
+    # put all cards of the table in the graveyard
+    @emptyTable = ->
+      for card in @table
+        @graveyard.push card
+      @table = []
+      console.log('table is now empty')
       
     @nextTurn = ->
+      # take a fight of the cards only when there are 2 cards on the table
+      if @table.length == 2
+        console.log('début de l\'affrontement sur table!')
+        fightResult = @tableFight()
+        if fightResult == "equal"
+          @players[@table[0].ownerId].score++;
+          @players[@table[1].ownerId].score++;
+          console.log('égalité!')
+        else
+          @players[fightResult].score++;
+          console.log(@players[fightResult].name+' a gagné le match!')
+        @emptyTable()
       @setActivePlayer()
+      @refreshView()
       @askInput()
       
     @oneTurn = ->
@@ -270,6 +292,19 @@ $ ->
       @refreshView('hop')
       @nextTurn()
       
+    # fight between two players
+    # returns the winner id or the string "equal"
+    @tableFight = ()->
+      # comparaison
+      # case of equal strength
+      if( @table[0].points ==  @table[1].points )
+        return "equal"
+      else
+        if( @table[0].points >  @table[1].point )
+          return @table[0].ownerId 
+        else
+          return @table[1].ownerId 
+
     # fight between two players
     # returns the winner
     @fight = (p1 , p2)->
