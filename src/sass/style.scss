@@ -1,4 +1,7 @@
 $main-color : rgb(49, 112, 143);
+$dark : #222;
+$light : #ddd;
+$red : firebrick;
 
 body{
   background: black;
@@ -17,4 +20,48 @@ body{
   border: solid 1px $main-color;
   padding: 1em;
   
+}
+
+// cards style
+.dark-card{
+  background: $dark;
+  color: $light;
+}
+.red-card{
+  background: $red;
+  color: $light;
+}
+.card{
+  border-radius: 0.5em;
+  border: 0;
+  padding: 1em;
+  height: 10em;
+  width: 10ch;
+}
+.card-trèfle{
+  @extend .dark-card;
+}
+.card-pique{
+  @extend .dark-card;
+}
+.card-coeur{
+  @extend .red-card;
+}
+.card-carreau{
+  @extend .red-card;
+}
+.score-14{
+  font-size: 2em;
+}
+.score-13{
+  font-size: 1.85em;
+}
+.score-12{
+  font-size: 1.55em;
+}
+.score-11{
+  font-size: 1.4em;
+}
+.score-10{
+  font-size: 1.25em;
 }

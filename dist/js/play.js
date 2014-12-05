@@ -18,7 +18,7 @@
     ];
     dealer = new d.dealer(players, deck);
     deck.shuffle();
-    deck.distributeAll(players, 10);
+    deck.distributeAll(players, 5);
     dealer.play();
     dealer.log("play started");
     return autoClick = function() {

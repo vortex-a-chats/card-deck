@@ -223,7 +223,7 @@
         for (_i = 0, _len = cards.length; _i < _len; _i++) {
           c = cards[_i];
           guyId = parseInt(this.playerActive);
-          listing += '<button class="card col-lg-1" data-id="' + c.id + '" data-playerid="' + guyId + '">' + c.name + '</button>';
+          listing += '<button class="card card-' + c.color + ' score-' + c.points + ' col-lg-1" data-id="' + c.id + '" data-playerid="' + guyId + '">' + c.name + '</button>';
         }
         return listing;
       };

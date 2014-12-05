@@ -210,7 +210,7 @@ $ ->
       listing = ''
       for c in cards  
         guyId = parseInt(@playerActive)
-        listing += '<button class="card col-lg-1" data-id="'+c.id+'" data-playerid="'+guyId+'">'+c.name+'</button>'
+        listing += '<button class="card card-'+c.color+' score-'+c.points+' col-lg-1" data-id="'+c.id+'" data-playerid="'+guyId+'">'+c.name+'</button>'
       listing
 
     @interactionsJQ = ->
