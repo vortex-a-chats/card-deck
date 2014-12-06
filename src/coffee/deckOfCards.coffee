@@ -73,7 +73,6 @@ $ ->
       console.log  player.name+' (qui a '+player.cards.length+' cartes)'
       i # return the number of cards distributed
       
-    
     # distribute an equal number of cards to all the players
     @distributeAll = (players, int) ->
       console.log 'le deck avait '+@cards.length+' cartes'
@@ -343,6 +342,7 @@ $ ->
     # put a card in the table array
     # and return 
     @putCardToTable = (card)->
+      card.ownerId = @activeGuy.id
       # remove the card from active player's hand
       # only if it is a true player
       if @activeGuy.type == "true-player"
@@ -366,12 +366,25 @@ $ ->
         return "equal"
       else
         if( @table[0].points >  @table[1].points )
-          console.log "la carte 0 a gagné, son possesseur est "+@table[0].ownerId
+          console.log "perdant : "+@table[1].ownerId
+          @loserAction(@table[1].ownerId)
           return @table[0].ownerId 
+          
         else
-          console.log "la carte 1 a gagné, son possesseur est "+@table[1].ownerId
+          console.log "perdant : "+@table[0].ownerId
+          @loserAction(@table[0].ownerId)
           return @table[1].ownerId 
-
+    
+    # triggered after a table fight
+    @loserAction = (idLoser)->
+      # make the loser player pick a card from the deck
+      theGuy = @players[idLoser]
+      console.log @
+      if @deck.distribute( theGuy ,1)
+        console.log("le joueur "+@players[idLoser].name+" pioche une carte")
+      else
+        console.log("le joueur "+@players[idLoser].name+" n'a PAS pu pioche une carte")
+      
     # set who's turn it is to play
     @setActivePlayer = ->
       @playerActive++

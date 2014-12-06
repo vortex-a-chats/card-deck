@@ -348,6 +348,7 @@
       };
       this.putCardToTable = function(card) {
         var res;
+        card.ownerId = this.activeGuy.id;
         if (this.activeGuy.type === "true-player") {
           res = this.idToHandId(card.id, this.activeGuy.cards);
           console.log('carte et main du joueur: ', card.id, this.activeGuy.cards);
@@ -365,12 +366,24 @@
           return "equal";
         } else {
           if (this.table[0].points > this.table[1].points) {
-            console.log("la carte 0 a gagné, son possesseur est " + this.table[0].ownerId);
+            console.log("perdant : " + this.table[1].ownerId);
+            this.loserAction(this.table[1].ownerId);
             return this.table[0].ownerId;
           } else {
-            console.log("la carte 1 a gagné, son possesseur est " + this.table[1].ownerId);
+            console.log("perdant : " + this.table[0].ownerId);
+            this.loserAction(this.table[0].ownerId);
             return this.table[1].ownerId;
           }
+        }
+      };
+      this.loserAction = function(idLoser) {
+        var theGuy;
+        theGuy = this.players[idLoser];
+        console.log(this);
+        if (this.deck.distribute(theGuy, 1)) {
+          return console.log("le joueur " + this.players[idLoser].name + " pioche une carte");
+        } else {
+          return console.log("le joueur " + this.players[idLoser].name + " n'a PAS pu pioche une carte");
         }
       };
       this.setActivePlayer = function() {

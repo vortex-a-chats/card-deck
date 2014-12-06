@@ -7,8 +7,7 @@
     players = [
       new d.player({
         id: 0,
-        name: "bob",
-        type: "true-player"
+        name: "bob"
       }), new d.player({
         id: 1,
         name: "abrasiveGuy"
@@ -29,7 +28,8 @@
       console.log("autoclick");
       return $('#input-choice button')[0].click();
     };
-    return setTimeout(autoClick(), 50);
+    setTimeout(autoClick(), 50);
+    return setTimeout(autoClick(), 1000);
   });
 
 }).call(this);
