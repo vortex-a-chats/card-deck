@@ -176,17 +176,19 @@ $ ->
     @players = players
     @deck = deck
     @maxTurns = 10
+    @maxTableTurns = 10
     @turn = 0
     @playerToStart = 0
     @playerActive = 0
     @config = 
-      autoplay : 0
+      autoplay : 1
     @activeGuy = @players[@playerActive]
     @graveyard = [] # place where cards go when out of the game. RIP.
     @table = [] # place where cards are shown to everyone
     @otherPlayer = {} # player to compare scores with
     # ask active player to do something
     @askInput = ->
+      console.log "-----demande d'input"
       activeName = @players[@playerActive].name
       
       @activeGuy = @players[@playerActive];
@@ -199,7 +201,7 @@ $ ->
       choice = @cards2html(cards)
       $('#input-choice').html(choice)
       console.log('en attente du joueur: '+activeName)
-      @setState('statoi de jouer, '+activeName)
+      @setState('<h2>'+@turn+'</h2> statoi de jouer, '+activeName)
     
     #set a text in the state of the game
     @setState = (text)->
@@ -232,7 +234,7 @@ $ ->
       for card in @table
         @graveyard.push card
       @table = []
-      console.log('table is now empty')
+#      console.log('table is now empty')
       
     @nextTurn = ->
       @turn++
@@ -249,15 +251,17 @@ $ ->
           @players[fightResult].score++;
           @log(@players[fightResult].name+' a gagné le match!')
         @emptyTable()
-      console.log @maxTurns, @turn
-      if @maxTurns < @turn
-        return @gameOver()
+      
       @isItFinished()
 
     
     # check if the game is over
     # has current player won and has no cards left in his hands ?
     @isItFinished = ->
+      console.log @maxTurns, @turn
+      if @maxTurns < @turn
+        return @gameOver()
+        
       if @activeGuy.cards.length == 0
         return @winning()
       # continue game
@@ -266,11 +270,12 @@ $ ->
         @refreshView()
         if @config.autoplay
           if @activeGuy.type == "NPC"
-            @autoplay()
+            console.log " NPC spotted "+@activeGuy.name
+            return @autoplay()
           else
-            @askInput()
+            console.log " TRUE PLAYER spotted "+@activeGuy.name
         else
-          @askInput()
+          return @askInput()
           
     #end of the game
     @gameOver = ->
@@ -283,7 +288,7 @@ $ ->
       # a way to choose a card in the hand
       card = @activeGuy.cards.pop(0);
       @putCardToTable(card)
-      @nextTurn()
+#      @nextTurn()
       
     @winning = ->
       txt = 'le joueur '+@activeGuy.name+' est vainqueur!'

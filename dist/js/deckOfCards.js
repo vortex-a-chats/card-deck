@@ -189,11 +189,12 @@
       this.players = players;
       this.deck = deck;
       this.maxTurns = 10;
+      this.maxTableTurns = 10;
       this.turn = 0;
       this.playerToStart = 0;
       this.playerActive = 0;
       this.config = {
-        autoplay: 0
+        autoplay: 1
       };
       this.activeGuy = this.players[this.playerActive];
       this.graveyard = [];
@@ -201,6 +202,7 @@
       this.otherPlayer = {};
       this.askInput = function() {
         var activeName, cards, choice;
+        console.log("-----demande d'input");
         activeName = this.players[this.playerActive].name;
         this.activeGuy = this.players[this.playerActive];
         $('#input-instructions').html('play a card with a high value');
@@ -212,7 +214,7 @@
         choice = this.cards2html(cards);
         $('#input-choice').html(choice);
         console.log('en attente du joueur: ' + activeName);
-        return this.setState('statoi de jouer, ' + activeName);
+        return this.setState('<h2>' + this.turn + '</h2> statoi de jouer, ' + activeName);
       };
       this.setState = function(text) {
         return $('#state').html(text);
@@ -249,8 +251,7 @@
           card = _ref[_i];
           this.graveyard.push(card);
         }
-        this.table = [];
-        return console.log('table is now empty');
+        return this.table = [];
       };
       this.nextTurn = function() {
         var fightResult;
@@ -269,13 +270,13 @@
           }
           this.emptyTable();
         }
+        return this.isItFinished();
+      };
+      this.isItFinished = function() {
         console.log(this.maxTurns, this.turn);
         if (this.maxTurns < this.turn) {
           return this.gameOver();
         }
-        return this.isItFinished();
-      };
-      this.isItFinished = function() {
         if (this.activeGuy.cards.length === 0) {
           return this.winning();
         } else {
@@ -283,9 +284,10 @@
           this.refreshView();
           if (this.config.autoplay) {
             if (this.activeGuy.type === "NPC") {
+              console.log(" NPC spotted " + this.activeGuy.name);
               return this.autoplay();
             } else {
-              return this.askInput();
+              return console.log(" TRUE PLAYER spotted " + this.activeGuy.name);
             }
           } else {
             return this.askInput();
@@ -301,8 +303,7 @@
         var card;
         this.log(this.activeGuy.name + ' plays');
         card = this.activeGuy.cards.pop(0);
-        this.putCardToTable(card);
-        return this.nextTurn();
+        return this.putCardToTable(card);
       };
       this.winning = function() {
         var txt;

@@ -7,7 +7,7 @@ $ ->
     new d.player(
       id: 0
       name: "bob"
-#      type: "true-player"
+      type: "true-player"
     ),
     new d.player(
       id: 1

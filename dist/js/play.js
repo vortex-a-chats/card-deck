@@ -7,7 +7,8 @@
     players = [
       new d.player({
         id: 0,
-        name: "bob"
+        name: "bob",
+        type: "true-player"
       }), new d.player({
         id: 1,
         name: "abrasiveGuy"
