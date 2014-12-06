@@ -194,24 +194,17 @@
       this.playerToStart = 0;
       this.playerActive = 0;
       this.config = {
-        autoplay: 0
+        autoplay: 1
       };
       this.activeGuy = this.players[this.playerActive];
       this.graveyard = [];
       this.table = [];
       this.otherPlayer = {};
       this.askInput = function() {
-        var activeName, cards, choice;
+        var activeName;
+        console.log("-----demande d'input");
         this.activeGuy = this.players[this.playerActive];
         activeName = this.activeGuy.name;
-        $('#input-instructions').html('play a card with a high value');
-        cards = [];
-        if (this.activeGuy) {
-          cards = this.activeGuy.cards;
-        }
-        choice = '';
-        choice = this.cards2html(cards);
-        $('#input-choice').html(choice);
         console.log('en attente du joueur: ' + activeName);
         return this.setState('<h2>' + this.turn + '</h2> statoi de jouer, ' + activeName);
       };
@@ -236,6 +229,7 @@
           d = window.$tk.theDealer;
           name = self.attr("data-playerid");
           cardId = self.attr("data-id");
+          console.log("d.activeGuy ", d.activeGuy);
           card = d.idToCard(cardId, d.activeGuy.cards);
           if (card) {
             d.putCardToTable(card);
@@ -261,7 +255,6 @@
           if (fightResult === "equal") {
             console.log('égalité!');
           } else {
-            this.players[fightResult].score++;
             this.players[fightResult].score++;
             console.log(this.players[fightResult].name + ' a gagné le match!');
             this.log(this.players[fightResult].name + ' a gagné le match!');
@@ -312,8 +305,8 @@
         return $("#state").html(txt);
       };
       this.oneTurn = function() {
-        this.askInput();
-        return this.interactionsJQ();
+        this.refreshView();
+        return this.askInput();
       };
       this.idToCard = function(needle, haystack) {
         var c, i, _i, _len;
@@ -345,9 +338,12 @@
       this.play = function() {
         var i, log;
         this.maxTurns = this.maxTableTurns * players.length;
+        this.activeGuy = this.players[this.playerToStart];
+        this.playerActive = this.playerToStart;
         console.log('play sparti');
         log = "";
         i = 1;
+        this.interactionsJQ();
         return this.oneTurn();
       };
       this.putCardToTable = function(card) {
@@ -368,9 +364,11 @@
         if (this.table[0].points === this.table[1].points) {
           return "equal";
         } else {
-          if (this.table[0].points > this.table[1].point) {
+          if (this.table[0].points > this.table[1].points) {
+            console.log("la carte 0 a gagné, son possesseur est " + this.table[0].ownerId);
             return this.table[0].ownerId;
           } else {
+            console.log("la carte 1 a gagné, son possesseur est " + this.table[1].ownerId);
             return this.table[1].ownerId;
           }
         }
@@ -380,8 +378,7 @@
         if (this.playerActive >= players.length) {
           this.playerActive = 0;
         }
-        this.activeGuy = this.players[this.playerActive];
-        return console.log("le joueur actif est maintenant " + this.activeGuy.name);
+        return this.activeGuy = this.players[this.playerActive];
       };
       this.log = function(text) {
         if (this.turn !== this.lastTurn) {
@@ -392,12 +389,20 @@
         return this.lastTurn = this.turn;
       };
       this.refreshView = function() {
-        var status, tempCount, _results;
+        var cards, choice, status, tempCount, _results;
         players = this.players;
         status = deck.health();
         $("#table").html(this.cards2html(this.table));
         $("#state").html(status);
         $("#graveyard").html(this.cards2html(this.graveyard));
+        $('#input-instructions').html(this.activeGuy.name + ' play a card with a high value');
+        cards = [];
+        if (this.activeGuy) {
+          cards = this.activeGuy.cards;
+          choice = '';
+          choice = this.cards2html(cards);
+          $('#input-choice').html(choice);
+        }
         tempCount = 0;
         _results = [];
         while (tempCount < this.players.length) {

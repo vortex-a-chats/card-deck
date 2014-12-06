@@ -181,25 +181,25 @@ $ ->
     @playerToStart = 0
     @playerActive = 0
     @config = 
-      autoplay : 0
+      autoplay : 1
     @activeGuy = @players[@playerActive]
     @graveyard = [] # place where cards go when out of the game. RIP.
     @table = [] # place where cards are shown to everyone
     @otherPlayer = {} # player to compare scores with
     # ask active player to do something
     @askInput = ->
-#      console.log "-----demande d'input"
+      console.log "-----demande d'input"
       @activeGuy = @players[@playerActive];
       activeName = @activeGuy.name
       
-      $('#input-instructions').html('play a card with a high value')
-      #      list the cards of the player.
-      cards = []
-      if @activeGuy
-        cards = @activeGuy.cards
-      choice = ''
-      choice = @cards2html(cards)
-      $('#input-choice').html(choice)
+#      $('#input-instructions').html( activeName+' play a card with a high value')
+#      #      list the cards of the player.
+#      cards = []
+#      if @activeGuy
+#        cards = @activeGuy.cards
+#        choice = ''
+#        choice = @cards2html(cards)
+#        $('#input-choice').html(choice)
       console.log('en attente du joueur: '+activeName)
       @setState('<h2>'+@turn+'</h2> statoi de jouer, '+activeName)
     
@@ -223,6 +223,7 @@ $ ->
         d= window.$tk.theDealer
         name = self.attr("data-playerid")
         cardId = self.attr("data-id")
+        console.log "d.activeGuy ", d.activeGuy
         card = d.idToCard( cardId , d.activeGuy.cards )
         if card
           d.putCardToTable(card)
@@ -234,7 +235,7 @@ $ ->
       for card in @table
         @graveyard.push card
       @table = []
-#      console.log('table is now empty')
+      #      console.log('table is now empty')
       
     @nextTurn = ->
       @turn++
@@ -248,7 +249,7 @@ $ ->
           console.log('égalité!')
         else
           @players[fightResult].score++;
-          @players[fightResult].score++;
+          
           console.log(@players[fightResult].name+' a gagné le match!')
           @log(@players[fightResult].name+' a gagné le match!')
         @emptyTable()
@@ -300,8 +301,9 @@ $ ->
       $("#state").html txt
       
     @oneTurn = ->
+      @refreshView()
       @askInput()
-      @interactionsJQ()
+      
       
     # check for cards of a player,
     # remove the one we are looking for and return it
@@ -331,9 +333,12 @@ $ ->
     # run all the turns
     @play = ->
       @maxTurns = (@maxTableTurns * players.length)
+      @activeGuy = @players[@playerToStart]
+      @playerActive = @playerToStart
       console.log 'play sparti'
       log = ""
       i = 1
+      @interactionsJQ()
       @oneTurn()
     # put a card in the table array
     # and return 
@@ -360,9 +365,11 @@ $ ->
       if( @table[0].points ==  @table[1].points )
         return "equal"
       else
-        if( @table[0].points >  @table[1].point )
+        if( @table[0].points >  @table[1].points )
+          console.log "la carte 0 a gagné, son possesseur est "+@table[0].ownerId
           return @table[0].ownerId 
         else
+          console.log "la carte 1 a gagné, son possesseur est "+@table[1].ownerId
           return @table[1].ownerId 
 
     # set who's turn it is to play
@@ -370,7 +377,7 @@ $ ->
       @playerActive++
       @playerActive = 0  if @playerActive >= players.length
       @activeGuy = @players[@playerActive]
-      console.log "le joueur actif est maintenant "+@activeGuy.name
+      #console.log "le joueur actif est maintenant "+@activeGuy.name
 
     @log = (text) ->
       if @turn != @lastTurn
@@ -385,6 +392,14 @@ $ ->
       $("#table").html @cards2html(@table)
       $("#state").html status
       $("#graveyard").html @cards2html(@graveyard)
+      $('#input-instructions').html( @activeGuy.name+' play a card with a high value')
+      #      list the cards of the player.
+      cards = []
+      if @activeGuy
+        cards = @activeGuy.cards
+        choice = ''
+        choice = @cards2html(cards)
+        $('#input-choice').html(choice)
       tempCount = 0
       while tempCount < @players.length
         $("#player-" + tempCount).html players[tempCount].status()
