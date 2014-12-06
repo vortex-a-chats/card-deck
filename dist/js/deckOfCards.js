@@ -188,8 +188,8 @@
     Dealer = function(players, deck) {
       this.players = players;
       this.deck = deck;
-      this.maxTurns = 10;
-      this.maxTableTurns = 10;
+      this.maxTableTurns = 20;
+      this.maxTurns = 20;
       this.turn = 0;
       this.playerToStart = 0;
       this.playerActive = 0;
@@ -202,9 +202,8 @@
       this.otherPlayer = {};
       this.askInput = function() {
         var activeName, cards, choice;
-        console.log("-----demande d'input");
-        activeName = this.players[this.playerActive].name;
         this.activeGuy = this.players[this.playerActive];
+        activeName = this.activeGuy.name;
         $('#input-instructions').html('play a card with a high value');
         cards = [];
         if (this.activeGuy) {
@@ -273,7 +272,7 @@
         return this.isItFinished();
       };
       this.isItFinished = function() {
-        console.log(this.maxTurns, this.turn);
+        console.log("checking if the game is over, turn: " + this.turn + " / " + this.maxTurns);
         if (this.maxTurns < this.turn) {
           return this.gameOver();
         }
@@ -284,8 +283,7 @@
           this.refreshView();
           if (this.config.autoplay) {
             if (this.activeGuy.type === "NPC") {
-              console.log(" NPC spotted " + this.activeGuy.name);
-              return this.autoplay();
+              return setTimeout(this.autoplay(), 500);
             } else {
               return console.log(" TRUE PLAYER spotted " + this.activeGuy.name);
             }
@@ -303,10 +301,12 @@
         var card;
         this.log(this.activeGuy.name + ' plays');
         card = this.activeGuy.cards.pop(0);
+        this.refreshView();
         return this.putCardToTable(card);
       };
       this.winning = function() {
         var txt;
+        $("#input-choice, #table").fadeOut();
         txt = 'le joueur ' + this.activeGuy.name + ' est vainqueur!';
         console.log(txt);
         this.log(txt);
@@ -345,6 +345,7 @@
       };
       this.play = function() {
         var i, log;
+        this.maxTurns = this.maxTableTurns * players.length;
         console.log('play sparti');
         log = "";
         i = 1;
@@ -353,6 +354,7 @@
       this.putCardToTable = function(card) {
         var res;
         res = this.idToHandId(card.id, this.activeGuy.cards);
+        console.log('id de la carte à enlever de la main du joueur: ', res, this.activeGuy.cards[res]);
         this.activeGuy.cards.pop(res);
         this.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
         this.table.push(card);
@@ -376,7 +378,8 @@
         if (this.playerActive >= players.length) {
           this.playerActive = 0;
         }
-        return this.activeGuy = this.players[this.playerActive];
+        this.activeGuy = this.players[this.playerActive];
+        return console.log("le joueur actif est maintenant " + this.activeGuy.name);
       };
       this.log = function(text) {
         if (this.turn !== this.lastTurn) {

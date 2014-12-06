@@ -7,8 +7,7 @@
     players = [
       new d.player({
         id: 0,
-        name: "bob",
-        type: "true-player"
+        name: "bob"
       }), new d.player({
         id: 1,
         name: "abrasiveGuy"
@@ -19,12 +18,14 @@
     ];
     dealer = new d.dealer(players, deck);
     deck.shuffle();
-    deck.distributeAll(players, 5);
+    deck.distributeAll(players, 10);
     dealer.play();
     dealer.log("play started");
-    return autoClick = function() {
+    autoClick = function() {
+      console.log("autoclick");
       return $('#input-choice button')[0].click();
     };
+    return setTimeout(autoClick(), 50);
   });
 
 }).call(this);

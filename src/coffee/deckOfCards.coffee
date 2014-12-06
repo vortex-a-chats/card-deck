@@ -175,8 +175,8 @@ $ ->
   Dealer = (players, deck) ->
     @players = players
     @deck = deck
-    @maxTurns = 10
-    @maxTableTurns = 10
+    @maxTableTurns = 20
+    @maxTurns = 20
     @turn = 0
     @playerToStart = 0
     @playerActive = 0
@@ -188,10 +188,10 @@ $ ->
     @otherPlayer = {} # player to compare scores with
     # ask active player to do something
     @askInput = ->
-      console.log "-----demande d'input"
-      activeName = @players[@playerActive].name
-      
+#      console.log "-----demande d'input"
       @activeGuy = @players[@playerActive];
+      activeName = @activeGuy.name
+      
       $('#input-instructions').html('play a card with a high value')
       #      list the cards of the player.
       cards = []
@@ -258,10 +258,9 @@ $ ->
     # check if the game is over
     # has current player won and has no cards left in his hands ?
     @isItFinished = ->
-      console.log @maxTurns, @turn
+      console.log "checking if the game is over, turn: "+@turn+" / "+@maxTurns
       if @maxTurns < @turn
         return @gameOver()
-        
       if @activeGuy.cards.length == 0
         return @winning()
       # continue game
@@ -270,8 +269,8 @@ $ ->
         @refreshView()
         if @config.autoplay
           if @activeGuy.type == "NPC"
-            console.log " NPC spotted "+@activeGuy.name
-            return @autoplay()
+            #console.log " NPC spotted "+@activeGuy.name
+            return setTimeout( @autoplay() , 500)
           else
             console.log " TRUE PLAYER spotted "+@activeGuy.name
         else
@@ -287,10 +286,12 @@ $ ->
       @log(@activeGuy.name+' plays')
       # a way to choose a card in the hand
       card = @activeGuy.cards.pop(0);
+      @refreshView()
       @putCardToTable(card)
-#      @nextTurn()
+      
       
     @winning = ->
+      $("#input-choice, #table").fadeOut()
       txt = 'le joueur '+@activeGuy.name+' est vainqueur!'
       console.log(txt)
       @log(txt)
@@ -327,6 +328,7 @@ $ ->
         
     # run all the turns
     @play = ->
+      @maxTurns = (@maxTableTurns * players.length)
       console.log 'play sparti'
       log = ""
       i = 1
@@ -336,7 +338,7 @@ $ ->
     @putCardToTable = (card)->
       # remove the card from active player's hand
       res = @idToHandId(card.id, @activeGuy.cards)
-      # console.log('id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
+      console.log('id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
       @activeGuy.cards.pop res
       @log('le joueur '+@activeGuy.name+' pose la carte '+card.name)
       @table.push card
@@ -362,6 +364,7 @@ $ ->
       @playerActive++
       @playerActive = 0  if @playerActive >= players.length
       @activeGuy = @players[@playerActive]
+      console.log "le joueur actif est maintenant "+@activeGuy.name
 
     @log = (text) ->
       if @turn != @lastTurn
