@@ -7,7 +7,7 @@ $ ->
     new d.player(
       id: 0
       name: "bob"
-#      type: "true-player"
+      type: "true-player"
     ),
     new d.player(
       id: 1
@@ -16,11 +16,15 @@ $ ->
     new d.player(
       id: 2
       name: "chewbacca"
+    ),
+    new d.player(
+      id: 3
+      name: "chuck norris"
     )
   ]
   dealer = new d.dealer(players, deck)
   deck.shuffle()
-  deck.distributeAll players, 10
+  deck.distributeAll players, 5
   dealer.play()
   dealer.log "play started"
   autoClick = ()->

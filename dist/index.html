@@ -23,15 +23,19 @@ and open the template in the editor.
         </h1>
       </div>
       <section>
-        <div id="input-choice" class="well row">
+        <div id="input-choice" class="well row"></div>
+        <div class="row">
+          <div id="state" class="col-lg-4 col-sm-4 well"></div>
+          <div id="input-instructions" class=" col-sm-4 well text-info"></div>
 
+          <div class="col-lg-4 col-sm-4 well" >Table:
+            <div id="table"></div>
+          </div>
+          <div class="col-lg-12 col-sm-12 well" >Hors jeu:
+            <div id="graveyard" ></div>
+          </div>
         </div>
-        Table:
-        <div id="table" class="col-lg-4 well"></div>
-        <div id="state" class="col-lg-4 well"></div>
-        <div id="input-instructions" class="well text-info">
 
-        </div>
 
       </section>
       <section>
@@ -65,10 +69,11 @@ and open the template in the editor.
                     La valeur la plus élevée fait gagner un point à son joueur.
                   </li>
                   <li>
-                    Une égalité fait gagner un point aux deux joueurs.
+                    Le perdant pioche une carte
                   </li>
                   <li>
-                    Le perdant pioche une carte
+                    Une égalité ne fait gagner aucun point aux deux joueurs. <br />
+                    Ils ne piochent pas de carte non plus.
                   </li>
                   <li>
                     Si un joueur n'a plus de cartes, il gagne.

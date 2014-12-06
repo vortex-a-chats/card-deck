@@ -167,7 +167,7 @@
       };
       this.status = function() {
         var content, text;
-        content = "player " + this.id + ") " + this.name + ". having <strong>" + this.cards.length + " </strong>cards <br/> <strong>" + this.score + " points</score>";
+        content = "player " + this.id + ") " + this.name + ". having <strong>" + this.cards.length + " </strong>cards <br/> <span class='score'>" + this.score + "</span> points";
         text = content;
         if (this.victory) {
           text = "<div class='alert-success alert'>" + content + "</div>";
@@ -194,7 +194,7 @@
       this.playerToStart = 0;
       this.playerActive = 0;
       this.config = {
-        autoplay: 1
+        autoplay: 0
       };
       this.activeGuy = this.players[this.playerActive];
       this.graveyard = [];
@@ -259,12 +259,11 @@
           console.log('début de l\'affrontement sur table!');
           fightResult = this.tableFight();
           if (fightResult === "equal") {
-            this.players[this.table[0].ownerId].score++;
-            this.players[this.table[1].ownerId].score++;
             console.log('égalité!');
           } else {
             this.players[fightResult].score++;
             this.players[fightResult].score++;
+            console.log(this.players[fightResult].name + ' a gagné le match!');
             this.log(this.players[fightResult].name + ' a gagné le match!');
           }
           this.emptyTable();
@@ -272,7 +271,6 @@
         return this.isItFinished();
       };
       this.isItFinished = function() {
-        console.log("checking if the game is over, turn: " + this.turn + " / " + this.maxTurns);
         if (this.maxTurns < this.turn) {
           return this.gameOver();
         }
@@ -308,6 +306,7 @@
         var txt;
         $("#input-choice, #table").fadeOut();
         txt = 'le joueur ' + this.activeGuy.name + ' est vainqueur!';
+        this.activeGuy.won = 1;
         console.log(txt);
         this.log(txt);
         return $("#state").html(txt);
@@ -353,12 +352,15 @@
       };
       this.putCardToTable = function(card) {
         var res;
-        res = this.idToHandId(card.id, this.activeGuy.cards);
-        console.log('id de la carte à enlever de la main du joueur: ', res, this.activeGuy.cards[res]);
-        this.activeGuy.cards.pop(res);
+        if (this.activeGuy.type === "true-player") {
+          res = this.idToHandId(card.id, this.activeGuy.cards);
+          console.log('carte et main du joueur: ', card.id, this.activeGuy.cards);
+          console.log('id de la carte à enlever de la main du joueur: ', res, this.activeGuy.cards[res]);
+          this.activeGuy.cards.pop(res);
+        }
+        console.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
         this.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
         this.table.push(card);
-        console.log('mise a jour des joueurs');
         this.refreshView();
         return this.nextTurn();
       };

@@ -157,7 +157,7 @@ $ ->
       false
 
     @status = ->
-      content = "player " + @id + ") " + @name + ". having <strong>" + @cards.length + " </strong>cards <br/> <strong>" + @score + " points</score>"
+      content = "player " + @id + ") " + @name + ". having <strong>" + @cards.length + " </strong>cards <br/> <span class='score'>" + @score + "</span> points"
       text = content
       if @victory
         text = "<div class='alert-success alert'>"+content+"</div>"
@@ -181,7 +181,7 @@ $ ->
     @playerToStart = 0
     @playerActive = 0
     @config = 
-      autoplay : 1
+      autoplay : 0
     @activeGuy = @players[@playerActive]
     @graveyard = [] # place where cards go when out of the game. RIP.
     @table = [] # place where cards are shown to everyone
@@ -243,12 +243,13 @@ $ ->
         console.log('début de l\'affrontement sur table!')
         fightResult = @tableFight()
         if fightResult == "equal"
-          @players[@table[0].ownerId].score++;
-          @players[@table[1].ownerId].score++;
+#          @players[@table[0].ownerId].score++;
+#          @players[@table[1].ownerId].score++;
           console.log('égalité!')
         else
           @players[fightResult].score++;
           @players[fightResult].score++;
+          console.log(@players[fightResult].name+' a gagné le match!')
           @log(@players[fightResult].name+' a gagné le match!')
         @emptyTable()
       
@@ -258,7 +259,7 @@ $ ->
     # check if the game is over
     # has current player won and has no cards left in his hands ?
     @isItFinished = ->
-      console.log "checking if the game is over, turn: "+@turn+" / "+@maxTurns
+      # console.log "checking if the game is over, turn: "+@turn+" / "+@maxTurns
       if @maxTurns < @turn
         return @gameOver()
       if @activeGuy.cards.length == 0
@@ -293,6 +294,7 @@ $ ->
     @winning = ->
       $("#input-choice, #table").fadeOut()
       txt = 'le joueur '+@activeGuy.name+' est vainqueur!'
+      @activeGuy.won = 1
       console.log(txt)
       @log(txt)
       $("#state").html txt
@@ -337,12 +339,16 @@ $ ->
     # and return 
     @putCardToTable = (card)->
       # remove the card from active player's hand
-      res = @idToHandId(card.id, @activeGuy.cards)
-      console.log('id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
-      @activeGuy.cards.pop res
+      # only if it is a true player
+      if @activeGuy.type == "true-player"
+        res = @idToHandId(card.id, @activeGuy.cards)
+        console.log('carte et main du joueur: ', card.id, @activeGuy.cards)
+        console.log('id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
+        @activeGuy.cards.pop res
+      console.log('le joueur '+@activeGuy.name+' pose la carte '+card.name)
       @log('le joueur '+@activeGuy.name+' pose la carte '+card.name)
       @table.push card
-      console.log('mise a jour des joueurs')
+      # console.log('mise a jour des joueurs')
       @refreshView()
       @nextTurn()
       

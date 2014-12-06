@@ -50,18 +50,29 @@ body{
 .card-carreau{
   @extend .red-card;
 }
-.score-14{
-  font-size: 2em;
+.score{
+  font-size: 3em;
 }
-.score-13{
-  font-size: 1.85em;
-}
-.score-12{
-  font-size: 1.55em;
-}
-.score-11{
-  font-size: 1.4em;
-}
-.score-10{
-  font-size: 1.25em;
+#graveyard{
+    .card{
+      float: left;
+      margin: 1em 0.5em ;
+    }
+  }
+#input-choice{
+  .score-14{
+    font-size: 2em;
+  }
+  .score-13{
+    font-size: 1.85em;
+  }
+  .score-12{
+    font-size: 1.55em;
+  }
+  .score-11{
+    font-size: 1.4em;
+  }
+  .score-10{
+    font-size: 1.25em;
+  }
 }
