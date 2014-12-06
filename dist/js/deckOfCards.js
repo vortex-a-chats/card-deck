@@ -60,19 +60,21 @@
       };
       this.distribute = function(player, int) {
         var i, oneCard;
-        console.log('le deck avait ' + this.cards.length + ' cartes');
-        console.log('distribution de carte à ' + player.name + ' (qui a ' + player.cards.length + ' cartes)');
         i = 0;
-        if (int === i) {
+        if (int === 0) {
           return;
+        }
+        if (this.cards.length === 0) {
+          return 0;
         }
         while (i < int) {
           oneCard = this.cards.pop();
+          oneCard.ownerId = i;
           player.cards.push(oneCard);
           i++;
         }
         this.hasDistributed = 1;
-        console.log(player.name + ' (qui a ' + player.cards.length + ' cartes)');
+        console.log(player.name + ' a maintenant ' + player.cards.length + ' cartes)');
         return i;
       };
       this.distributeAll = function(players, int) {
@@ -189,7 +191,7 @@
       this.players = players;
       this.deck = deck;
       this.maxTableTurns = 20;
-      this.maxTurns = 20;
+      this.maxTurns = 200;
       this.turn = 0;
       this.playerToStart = 0;
       this.playerActive = 0;
@@ -201,10 +203,17 @@
       this.table = [];
       this.otherPlayer = {};
       this.askInput = function() {
-        var activeName;
+        var activeName, cards, choice;
         console.log("-----demande d'input");
         this.activeGuy = this.players[this.playerActive];
         activeName = this.activeGuy.name;
+        cards = [];
+        if (this.activeGuy) {
+          cards = this.activeGuy.cards;
+          choice = '';
+          choice = this.cards2html(cards);
+          $('#input-choice').html(choice);
+        }
         console.log('en attente du joueur: ' + activeName);
         return this.setState('<h2>' + this.turn + '</h2> statoi de jouer, ' + activeName);
       };
@@ -229,12 +238,10 @@
           d = window.$tk.theDealer;
           name = self.attr("data-playerid");
           cardId = self.attr("data-id");
-          console.log("d.activeGuy ", d.activeGuy);
           card = d.idToCard(cardId, d.activeGuy.cards);
-          if (card) {
-            d.putCardToTable(card);
-            return self.fadeOut();
-          }
+          console.log("carte a poser: ", card);
+          d.putCardToTable(card);
+          return self.fadeOut();
         });
       };
       this.emptyTable = function() {
@@ -276,7 +283,7 @@
             if (this.activeGuy.type === "NPC") {
               return setTimeout(this.autoplay(), 500);
             } else {
-              return console.log(" TRUE PLAYER spotted " + this.activeGuy.name);
+
             }
           } else {
             return this.askInput();
@@ -290,7 +297,7 @@
       };
       this.autoplay = function() {
         var card;
-        this.log(this.activeGuy.name + ' plays');
+        console.log(' AUTOPLAY ' + this.activeGuy.name + ':');
         card = this.activeGuy.cards.pop(0);
         this.refreshView();
         return this.putCardToTable(card);
@@ -349,16 +356,13 @@
       this.putCardToTable = function(card) {
         var res;
         card.ownerId = this.activeGuy.id;
-        if (this.activeGuy.type === "true-player") {
-          res = this.idToHandId(card.id, this.activeGuy.cards);
-          console.log('carte et main du joueur: ', card.id, this.activeGuy.cards);
-          console.log('id de la carte à enlever de la main du joueur: ', res, this.activeGuy.cards[res]);
-          this.activeGuy.cards.pop(res);
-        }
-        console.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
-        this.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
+        res = this.idToHandId(card.id, this.activeGuy.cards);
+        this.activeGuy.cards.splice(res, 1);
         this.table.push(card);
-        this.refreshView();
+        if (this.activeGuy.type === "true-player") {
+          console.log('   le joueur a maintenant ' + this.activeGuy.cards.length + ' cartes');
+        }
+        this.log('le joueur ' + this.activeGuy.name + ' pose la carte ' + card.name);
         return this.nextTurn();
       };
       this.tableFight = function() {
@@ -366,24 +370,27 @@
           return "equal";
         } else {
           if (this.table[0].points > this.table[1].points) {
-            console.log("perdant : " + this.table[1].ownerId);
             this.loserAction(this.table[1].ownerId);
             return this.table[0].ownerId;
           } else {
-            console.log("perdant : " + this.table[0].ownerId);
             this.loserAction(this.table[0].ownerId);
             return this.table[1].ownerId;
           }
         }
       };
       this.loserAction = function(idLoser) {
-        var theGuy;
+        var result, theGuy;
         theGuy = this.players[idLoser];
-        console.log(this);
-        if (this.deck.distribute(theGuy, 1)) {
+        result = this.deck.distribute(theGuy, 1);
+        if (result === 1) {
           return console.log("le joueur " + this.players[idLoser].name + " pioche une carte");
         } else {
-          return console.log("le joueur " + this.players[idLoser].name + " n'a PAS pu pioche une carte");
+          if (result === 0) {
+            console.log("le joueur " + this.players[idLoser].name + " n'a PAS pu pioche une carte");
+            if (this.players[idLoser].cards.length === 0) {
+              return this.winning();
+            }
+          }
         }
       };
       this.setActivePlayer = function() {
@@ -410,12 +417,10 @@
         $("#graveyard").html(this.cards2html(this.graveyard));
         $('#input-instructions').html(this.activeGuy.name + ' play a card with a high value');
         cards = [];
-        if (this.activeGuy) {
-          cards = this.activeGuy.cards;
-          choice = '';
-          choice = this.cards2html(cards);
-          $('#input-choice').html(choice);
-        }
+        cards = this.activeGuy.cards;
+        choice = '';
+        choice = this.cards2html(cards);
+        $('#input-choice').html('<h2>Main de ' + this.activeGuy.name + '</h2>' + choice);
         tempCount = 0;
         _results = [];
         while (tempCount < this.players.length) {

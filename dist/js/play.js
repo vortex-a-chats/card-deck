@@ -7,29 +7,22 @@
     players = [
       new d.player({
         id: 0,
-        name: "bob"
+        name: "bob",
+        type: "true-player"
       }), new d.player({
         id: 1,
-        name: "abrasiveGuy"
-      }), new d.player({
-        id: 2,
-        name: "chewbacca"
-      }), new d.player({
-        id: 3,
-        name: "chuck norris"
+        name: "abrasiveGuy",
+        type: "true-player"
       })
     ];
     dealer = new d.dealer(players, deck);
-    deck.shuffle();
-    deck.distributeAll(players, 5);
+    deck.distributeAll(players, 6);
     dealer.play();
     dealer.log("play started");
-    autoClick = function() {
+    return autoClick = function() {
       console.log("autoclick");
       return $('#input-choice button')[0].click();
     };
-    setTimeout(autoClick(), 50);
-    return setTimeout(autoClick(), 1000);
   });
 
 }).call(this);
