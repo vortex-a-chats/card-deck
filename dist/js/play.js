@@ -16,6 +16,7 @@
       })
     ];
     dealer = new d.dealer(players, deck);
+    deck.shuffle();
     deck.distributeAll(players, 6);
     dealer.play();
     dealer.log("play started");
