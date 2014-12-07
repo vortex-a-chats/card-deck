@@ -1,0 +1,1 @@
+window.testObject = { 1 : "yes"}

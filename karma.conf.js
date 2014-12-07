@@ -19,8 +19,8 @@ module.exports = function(config) {
       // dependencies
       'http://code.jquery.com/jquery-1.9.1.min.js',
       // files to test
-      'dist/js/deckOfCards.js',
-      'dist/js/play.js',
+//      'dist/js/deckOfCards.js',
+//      'dist/js/play.js',
       'dist/js/essai.js',
       // test cases to run
       'src/tests/tests.js'
