@@ -8,6 +8,25 @@ var options = require("minimist")(process.argv.slice(2));
 var sass = require('gulp-sass');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
+var karma = require('gulp-karma');
+
+var testFiles = [
+  'dist/js/play.js'
+];
+
+gulp.task('test', function() {
+  // Be sure to return the stream
+  return gulp.src(testFiles)
+    .pipe(karma({
+      configFile: 'karma.conf.js',
+      action: 'run'
+    }))
+    .on('error', function(err) {
+      // Make sure failed tests cause gulp to exit non-zero
+      throw err;
+    });
+});
+
 
 var sources ={
   sass : "src/sass/*.scss",
