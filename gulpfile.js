@@ -8,27 +8,33 @@ var options = require("minimist")(process.argv.slice(2));
 var sass = require('gulp-sass');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
-var karma = require('gulp-karma');
+var karma = require('karma').server;
 
 var testFiles = [
   'dist/js/play.js'
 ];
 
-gulp.task('test', function() {
-  // Be sure to return the stream
-  return gulp.src(testFiles)
-    .pipe(karma({
-      configFile: 'karma.conf.js',
-      action: 'run'
-    }))
-    .on('error', function(err) {
-      // Make sure failed tests cause gulp to exit non-zero
-      throw err;
-    });
+/**
+ * Run test once and exit
+ */
+gulp.task('test', function (done) {
+    karma.start({
+        configFile: __dirname + '/karma.conf.js',
+        singleRun: true
+    }, done);
 });
 
+/**
+ * Watch for file changes and re-run tests on each change
+ */
+gulp.task('tdd', function (done) {
+    karma.start({
+        configFile: __dirname + '/karma.conf.js'
+    }, done);
+});
 
 var sources ={
+    tests: "src/tests/*.js",
   sass : "src/sass/*.scss",
   html : "src/html/*.html",
   coffee : "src/coffee/*.coffee"
@@ -78,11 +84,12 @@ gulp.task("coffee2js", function () {
           .pipe(reload({stream: true}))
 });
 gulp.task('watch', function() {
+    gulp.watch(sources.tests, ['test']);
   gulp.watch(sources.sass, ['sass2css']);
   gulp.watch(sources.html, ['html']);
   gulp.watch(sources.coffee, ['coffee2js']);
   
 });
-gulp.task("default", ["coffee2js", "sass2css", "html", "browser-sync", "watch"], function () {
+gulp.task("default", ["coffee2js", "sass2css", "html", "browser-sync", "watch", "tdd"], function () {
   console.log("spartiiiii");
 });

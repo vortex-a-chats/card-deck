@@ -19,7 +19,7 @@ module.exports = function(config) {
       // dependencies
       'http://code.jquery.com/jquery-1.9.1.min.js',
       // files to test
-//      'dist/js/deckOfCards.js',
+        'dist/js/deckOfCards.js',
 //      'dist/js/play.js',
       'dist/js/essai.js',
       // test cases to run
@@ -63,7 +63,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+      browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode

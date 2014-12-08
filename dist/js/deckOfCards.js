@@ -77,18 +77,15 @@ any card
         i++;
       }
       this.hasDistributed = 1;
-      console.log(player.name + ' a maintenant ' + player.cards.length + ' cartes)');
       return i;
     };
     this.distributeAll = function(players, int) {
       var i, j, oneCard, player;
-      console.log('le deck avait ' + this.cards.length + ' cartes');
       this.players = players;
       i = 0;
       while (i < players.length) {
         if (typeof players[i] !== undefined) {
           player = players[i];
-          console.log('distribution de ' + int + ' cartes à ' + player.name);
           j = 0;
           while (j < int) {
             oneCard = this.cards.pop();
@@ -96,7 +93,6 @@ any card
             players[i].cards.push(oneCard);
             j++;
           }
-          console.log('    il a maintenant ' + player.cards.length + ' cartes');
         }
         i++;
       }
@@ -105,13 +101,14 @@ any card
       return true;
     };
     this.upPlayers = function() {
-      var p, _i, _len, _ref;
+      var p, _i, _len, _ref, _results;
       _ref = this.players;
+      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
-        $('#player-' + p.id).html('<strong>' + p.name + '</strong> ' + p.cards.length + ' cartes');
+        _results.push($('#player-' + p.id).html('<strong>' + p.name + '</strong> ' + p.cards.length + ' cartes'));
       }
-      return console.log('vue mise a jour');
+      return _results;
     };
     this.removeCard = function(card) {
       var cardid, exitedCard;
@@ -211,7 +208,6 @@ any card
     this.otherPlayer = {};
     this.askInput = function() {
       var activeName, cards, choice;
-      console.log("-----demande d'input");
       this.activeGuy = this.players[this.playerActive];
       activeName = this.activeGuy.name;
       cards = [];
@@ -221,7 +217,6 @@ any card
         choice = this.cards2html(cards);
         $('#input-choice').html(choice);
       }
-      console.log('en attente du joueur: ' + activeName);
       return this.setState('<h2>' + this.turn + '</h2> statoi de jouer, ' + activeName);
     };
     this.setState = function(text) {
@@ -246,7 +241,6 @@ any card
         name = self.attr("data-playerid");
         cardId = self.attr("data-id");
         card = d.idToCard(cardId, d.activeGuy.cards);
-        console.log("carte a poser: ", card);
         d.putCardToTable(card);
         return self.fadeOut();
       });
@@ -264,13 +258,11 @@ any card
       var fightResult;
       this.turn++;
       if (this.table.length === 2) {
-        console.log('début de l\'affrontement sur table!');
         fightResult = this.tableFight();
         if (fightResult === "equal") {
-          console.log('égalité!');
+
         } else {
           this.players[fightResult].score++;
-          console.log(this.players[fightResult].name + ' a gagné le match!');
           this.log(this.players[fightResult].name + ' a gagné le match!');
         }
         this.emptyTable();
@@ -304,7 +296,6 @@ any card
     };
     this.autoplay = function() {
       var card;
-      console.log(' AUTOPLAY ' + this.activeGuy.name + ':');
       card = this.activeGuy.cards.pop(0);
       this.refreshView();
       return this.putCardToTable(card);
@@ -314,7 +305,6 @@ any card
       $("#input-choice, #table").fadeOut();
       txt = 'le joueur ' + this.activeGuy.name + ' est vainqueur!';
       this.activeGuy.won = 1;
-      console.log(txt);
       this.log(txt);
       return $("#state").html(txt);
     };
@@ -325,16 +315,13 @@ any card
     this.idToCard = function(needle, haystack) {
       var c, i, _i, _len;
       needle = parseInt(needle);
-      console.log('we are looking for an id of', needle);
       i = 0;
       for (_i = 0, _len = haystack.length; _i < _len; _i++) {
         c = haystack[_i];
         if (parseInt(c.id) === needle) {
-          console.log('card found');
           return c;
         }
       }
-      console.log('card ' + needle + ' NOT found');
       return i++;
     };
     this.idToHandId = function(needle, haystack) {
@@ -354,7 +341,6 @@ any card
       this.maxTurns = this.maxTableTurns * players.length;
       this.activeGuy = this.players[this.playerToStart];
       this.playerActive = this.playerToStart;
-      console.log('play sparti');
       log = "";
       i = 1;
       this.interactionsJQ();
@@ -390,10 +376,9 @@ any card
       theGuy = this.players[idLoser];
       result = this.deck.distribute(theGuy, 1);
       if (result === 1) {
-        return console.log("le joueur " + this.players[idLoser].name + " pioche une carte");
+
       } else {
         if (result === 0) {
-          console.log("le joueur " + this.players[idLoser].name + " n'a PAS pu pioche une carte");
           if (this.players[idLoser].cards.length === 0) {
             return this.winning();
           }
@@ -457,8 +442,6 @@ any card
       a: "essai de a"
     };
   };
-
-  console.log("deckOfCards is ready!");
 
   window.deckOfCards = deckOfCards;
 

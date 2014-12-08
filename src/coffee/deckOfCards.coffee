@@ -58,8 +58,8 @@ Deck = ->
 
   # distribute a certain number of cards to one player
   @distribute = (player, int) ->
-#      console.log 'le deck avait '+@cards.length+' cartes'
-#      console.log 'distribution de carte à '+player.name+' (qui a '+player.cards.length+' cartes)'
+#      # console.log 'le deck avait '+@cards.length+' cartes'
+#      # console.log 'distribution de carte à '+player.name+' (qui a '+player.cards.length+' cartes)'
     i = 0
     if int is 0
       return
@@ -71,25 +71,25 @@ Deck = ->
       player.cards.push oneCard
       i++
     @hasDistributed = 1
-    console.log  player.name+' a maintenant '+player.cards.length+' cartes)'
+    # console.log  player.name+' a maintenant '+player.cards.length+' cartes)'
     i # return the number of cards distributed
 
   # distribute an equal number of cards to all the players
   @distributeAll = (players, int) ->
-    console.log 'le deck avait '+@cards.length+' cartes'
+    # console.log 'le deck avait '+@cards.length+' cartes'
     @players = players
     i = 0
     while i < players.length
       if typeof (players[i]) isnt `undefined`
         player = players[i]
-        console.log 'distribution de '+int+' cartes à '+player.name
+        # console.log 'distribution de '+int+' cartes à '+player.name
         j = 0
         while j < int
           oneCard = @cards.pop()
           oneCard.ownerId = i
           players[i].cards.push oneCard
           j++
-        console.log '    il a maintenant '+player.cards.length+' cartes'
+      # console.log '    il a maintenant '+player.cards.length+' cartes'
       i++
     @hasDistributed = 1
     @upPlayers()
@@ -98,7 +98,7 @@ Deck = ->
   @upPlayers = ()->
     for p in @players
       $('#player-'+p.id).html('<strong>'+p.name+'</strong> '+p.cards.length+' cartes')
-    console.log('vue mise a jour')
+  # console.log('vue mise a jour')
   # remove one card 
   @removeCard = (card) ->
     cardid = 12
@@ -188,7 +188,7 @@ Dealer = (players, deck) ->
   @otherPlayer = {} # player to compare scores with
   # ask active player to do something
   @askInput = ->
-    console.log "-----demande d'input"
+    # console.log "-----demande d'input"
     @activeGuy = @players[@playerActive];
     activeName = @activeGuy.name
 
@@ -200,7 +200,7 @@ Dealer = (players, deck) ->
       choice = ''
       choice = @cards2html(cards)
       $('#input-choice').html(choice)
-    console.log('en attente du joueur: '+activeName)
+    # console.log('en attente du joueur: '+activeName)
     @setState('<h2>'+@turn+'</h2> statoi de jouer, '+activeName)
 
   #set a text in the state of the game
@@ -225,7 +225,7 @@ Dealer = (players, deck) ->
       cardId = self.attr("data-id")
 
       card = d.idToCard( cardId , d.activeGuy.cards )
-      console.log "carte a poser: ", card
+      # console.log "carte a poser: ", card
 #        if card != undefined
       d.putCardToTable(card)
       self.fadeOut()
@@ -236,20 +236,20 @@ Dealer = (players, deck) ->
     for card in @table
       @graveyard.push card
     @table = []
-    #      console.log('table is now empty')
+  #      # console.log('table is now empty')
 
   @nextTurn = ->
     @turn++
     # take a fight of the cards only when there are 2 cards on the table
     if @table.length == 2
-      console.log('début de l\'affrontement sur table!')
+      # console.log('début de l\'affrontement sur table!')
       fightResult = @tableFight()
       if fightResult == "equal"
-        console.log('égalité!')
+        # console.log('égalité!')
       else
         @players[fightResult].score++;
 
-        console.log(@players[fightResult].name+' a gagné le match!')
+        # console.log(@players[fightResult].name+' a gagné le match!')
         @log(@players[fightResult].name+' a gagné le match!')
       @emptyTable()
 
@@ -259,7 +259,7 @@ Dealer = (players, deck) ->
   # check if the game is over
   # has current player won and has no cards left in his hands ?
   @isItFinished = ->
-    # console.log "checking if the game is over, turn: "+@turn+" / "+@maxTurns
+    # # console.log "checking if the game is over, turn: "+@turn+" / "+@maxTurns
     if @maxTurns < @turn
       return @gameOver()
     if @activeGuy.cards.length == 0
@@ -270,10 +270,10 @@ Dealer = (players, deck) ->
       @refreshView()
       if @config.autoplay
         if @activeGuy.type == "NPC"
-          #console.log " NPC spotted "+@activeGuy.name
+          ## console.log " NPC spotted "+@activeGuy.name
           return setTimeout( @autoplay() , 500)
         else
-          #console.log " TRUE PLAYER spotted "+@activeGuy.name
+          ## console.log " TRUE PLAYER spotted "+@activeGuy.name
       else
         return @askInput()
 
@@ -284,7 +284,7 @@ Dealer = (players, deck) ->
     $("#input-choice button").disable()
   # makes a non playing character play automatically
   @autoplay = ->
-    console.log(' AUTOPLAY '+@activeGuy.name+':')
+    # console.log(' AUTOPLAY '+@activeGuy.name+':')
     # a way to choose a card in the hand
     card = @activeGuy.cards.pop(0);
     @refreshView()
@@ -295,7 +295,7 @@ Dealer = (players, deck) ->
     $("#input-choice, #table").fadeOut()
     txt = 'le joueur '+@activeGuy.name+' est vainqueur!'
     @activeGuy.won = 1
-    console.log(txt)
+    # console.log(txt)
     @log(txt)
     $("#state").html txt
 
@@ -310,19 +310,19 @@ Dealer = (players, deck) ->
   # haystack is the card array
   @idToCard = (needle, haystack)->
     needle = parseInt(needle)
-    console.log('we are looking for an id of', needle)
+    # console.log('we are looking for an id of', needle)
     i = 0
     for c in haystack
-#        console.log('card tested', c.id , needle , c.name)
+#        # console.log('card tested', c.id , needle , c.name)
       if ( parseInt(c.id) == needle)
-        console.log('card found')
+        # console.log('card found')
         return c
-    console.log('card '+needle+' NOT found')
+    # console.log('card '+needle+' NOT found')
     i++
 
   @idToHandId = (needle, haystack)->
     needle = parseInt(needle)
-#      console.log('we are looking for an id of', needle, haystack)
+    #      # console.log('we are looking for an id of', needle, haystack)
     i = 0
     for c in haystack
       if ( parseInt(c.id) == needle)
@@ -334,7 +334,7 @@ Dealer = (players, deck) ->
     @maxTurns = (@maxTableTurns * players.length)
     @activeGuy = @players[@playerToStart]
     @playerActive = @playerToStart
-    console.log 'play sparti'
+    # console.log 'play sparti'
     log = ""
     i = 1
     @interactionsJQ()
@@ -349,14 +349,14 @@ Dealer = (players, deck) ->
     @table.push card
     # only if it is a true player
     if @activeGuy.type == "true-player"
-#        console.log('   le joueur a '+@activeGuy.cards.length+' cartes')
-#        console.log('   carte et main du joueur: ', card.id, @activeGuy.cards)
-#        console.log('   id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
-#        console.log('   le joueur '+@activeGuy.name+' pose la carte '+card.name)
+#        # console.log('   le joueur a '+@activeGuy.cards.length+' cartes')
+#        # console.log('   carte et main du joueur: ', card.id, @activeGuy.cards)
+#        # console.log('   id de la carte à enlever de la main du joueur: ', res, @activeGuy.cards[res])
+#        # console.log('   le joueur '+@activeGuy.name+' pose la carte '+card.name)
 #        @refreshView()
-#        console.log('   res '+res)
-#        console.log('   carte: ', card)
-      console.log('   le joueur a maintenant '+@activeGuy.cards.length+' cartes')
+#        # console.log('   res '+res)
+#        # console.log('   carte: ', card)
+      console.log('   le joueur a maintenant ' + @activeGuy.cards.length + ' cartes')
     @log('le joueur '+@activeGuy.name+' pose la carte '+card.name)
     # !!!!!!!!!
 #      choice = @cards2html(@activeGuy.cards)
@@ -372,12 +372,12 @@ Dealer = (players, deck) ->
       return "equal"
     else
       if( @table[0].points >  @table[1].points )
-#          console.log "perdant : "+@table[1].ownerId
+#          # console.log "perdant : "+@table[1].ownerId
         @loserAction(@table[1].ownerId)
         return @table[0].ownerId 
 
       else
-#          console.log "perdant : "+@table[0].ownerId
+#          # console.log "perdant : "+@table[0].ownerId
         @loserAction(@table[0].ownerId)
         return @table[1].ownerId 
 
@@ -387,10 +387,10 @@ Dealer = (players, deck) ->
     theGuy = @players[idLoser]
     result = @deck.distribute( theGuy ,1)
     if result == 1
-      console.log("le joueur "+@players[idLoser].name+" pioche une carte")
+      # console.log("le joueur "+@players[idLoser].name+" pioche une carte")
     else
       if result == 0
-        console.log("le joueur "+@players[idLoser].name+" n'a PAS pu pioche une carte")
+        # console.log("le joueur "+@players[idLoser].name+" n'a PAS pu pioche une carte")
         if @players[idLoser].cards.length == 0
           @winning()
 
@@ -399,7 +399,7 @@ Dealer = (players, deck) ->
     @playerActive++
     @playerActive = 0  if @playerActive >= players.length
     @activeGuy = @players[@playerActive]
-    #console.log "le joueur actif est maintenant "+@activeGuy.name
+  ## console.log "le joueur actif est maintenant "+@activeGuy.name
 
   @log = (text) ->
     if @turn != @lastTurn
@@ -439,7 +439,7 @@ $tk = {deckOfCards : deckOfCards}
 obj = ->
   a : "essai de a"
 
-console.log "deckOfCards is ready!"
+# console.log "deckOfCards is ready!"
 window.deckOfCards = deckOfCards
 window.obj = obj
 window.$tk = $tk
