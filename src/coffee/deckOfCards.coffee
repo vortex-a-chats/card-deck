@@ -417,7 +417,6 @@ Dealer = (players, deck) ->
     $('#input-instructions').html( @activeGuy.name+' play a card with a high value')
     #      list the cards of the player.
     cards = []
-#      if @activeGuy
     cards = @activeGuy.cards
     choice = ''
     choice = @cards2html(cards)
