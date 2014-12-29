@@ -5,7 +5,7 @@ any card
  */
 
 (function() {
-  var $tk, Card, Dealer, Deck, Player, deckOfCards, obj;
+  var $tk, Card, Dealer, Deck, Game, Player, deckOfCards;
 
   Card = function(config) {
     var attrname;
@@ -186,6 +186,32 @@ any card
 
 
   /**
+   a game contains the logic of gameplay
+   it has to be set in the Dealer
+   */
+
+  Game = function (config) {
+    var attrname, baseConfig;
+    this.briefing = function () {
+      return console.log("je suis un jeu");
+    };
+    baseConfig = {
+      name: "my game default name",
+      type: {},
+      author: "nobody",
+      nb_players: {
+        min: 1,
+        max: 2
+      }
+    };
+    for (attrname in config) {
+      this[attrname] = config[attrname];
+    }
+    return this;
+  };
+
+
+  /**
   core of the action in a game,
   the dealer runs the turns
   @returns {undefined}
@@ -197,6 +223,7 @@ any card
     this.maxTableTurns = 20;
     this.maxTurns = 200;
     this.turn = 0;
+    this.game = {};
     this.playerToStart = 0;
     this.playerActive = 0;
     this.config = {
@@ -206,6 +233,15 @@ any card
     this.graveyard = [];
     this.table = [];
     this.otherPlayer = {};
+    this.setGame = function (newGame) {
+      if (!newGame) {
+        console.log('nouveau jeu invalide: ');
+        console.log(newGame);
+        this.game = new Game();
+      }
+      this.game = newGame;
+      return console.log('nouveau jeu défini: ' + newGame.name);
+    };
     this.askInput = function() {
       var activeName, cards, choice;
       this.activeGuy = this.players[this.playerActive];
@@ -336,6 +372,9 @@ any card
         i++;
       }
     };
+    this.getGame = function () {
+      return this.game;
+    };
     this.play = function() {
       var i, log;
       this.maxTurns = this.maxTableTurns * players.length;
@@ -429,7 +468,9 @@ any card
       deck: Deck,
       card: Card,
       player: Player,
-      dealer: Dealer
+      dealer: Dealer,
+      game: Game,
+      jeux: []
     };
   };
 
@@ -437,15 +478,9 @@ any card
     deckOfCards: deckOfCards
   };
 
-  obj = function() {
-    return {
-      a: "essai de a"
-    };
-  };
+  console.log("deckOfCards is ready!");
 
   window.deckOfCards = deckOfCards;
-
-  window.obj = obj;
 
   window.$tk = $tk;
 

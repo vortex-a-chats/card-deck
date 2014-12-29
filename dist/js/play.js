@@ -1,5 +1,5 @@
 (function() {
-  var autoClick, d, dealer, deck, players;
+  var autoClick, currentGame, d, dealer, deck, players;
 
   $('#state').html('sparti');
 
@@ -21,6 +21,18 @@
 
   dealer = new d.dealer(players, deck);
 
+  console.log("$tk.jeux.bataille()  ------- ");
+
+  console.log(new $tk.jeux.bataille());
+
+  dealer.setGame(new $tk.jeux.bataille());
+
+  currentGame = dealer.getGame();
+
+  console.log(currentGame);
+
+  currentGame.briefing();
+
   deck.shuffle();
 
   deck.distributeAll(players, 6);
@@ -35,5 +47,7 @@
     console.log("autoclick");
     return $('#input-choice button')[0].click();
   };
+
+  console.log($tk.jeux);
 
 }).call(this);

@@ -168,6 +168,25 @@ Player = (config) ->
   this
 
 ###*
+a game contains the logic of gameplay
+it has to be set in the Dealer
+###
+Game = (config)->
+  @briefing = ->
+    console.log("je suis un jeu")
+  baseConfig =
+    name: "my game default name"
+    type: {}
+    author: "nobody"
+    nb_players: {
+      min: 1
+      max: 2
+    }
+  for attrname of config
+    this[attrname] = config[attrname]
+  this
+
+###*
 core of the action in a game,
 the dealer runs the turns
 @returns {undefined}
@@ -175,17 +194,30 @@ the dealer runs the turns
 Dealer = (players, deck) ->
   @players = players
   @deck = deck
+  # config of game environment
   @maxTableTurns = 20
   @maxTurns = 200
   @turn = 0
+  @game = {}
   @playerToStart = 0
   @playerActive = 0
   @config = 
     autoplay : 1
   @activeGuy = @players[@playerActive]
+
   @graveyard = [] # place where cards go when out of the game. RIP.
   @table = [] # place where cards are shown to everyone
   @otherPlayer = {} # player to compare scores with
+
+  # ask active player to do something
+  @setGame = (newGame)->
+    if !newGame
+      console.log('nouveau jeu invalide: ')
+      console.log(newGame)
+      @game = new Game()
+    @game = newGame
+    console.log('nouveau jeu défini: ' + newGame.name)
+
   # ask active player to do something
   @askInput = ->
     # console.log "-----demande d'input"
@@ -328,7 +360,8 @@ Dealer = (players, deck) ->
       if ( parseInt(c.id) == needle)
         return i
       i++
-
+  @getGame = ->
+    @game
   # run all the turns
   @play = ->
     @maxTurns = (@maxTableTurns * players.length)
@@ -433,12 +466,13 @@ deckOfCards = ->
   card : Card
   player : Player
   dealer : Dealer
-$tk = {deckOfCards : deckOfCards}
+  game: Game
+  jeux: []
 
-obj = ->
-  a : "essai de a"
+$tk = {
+  deckOfCards: deckOfCards
+}
 
-# console.log "deckOfCards is ready!"
+console.log "deckOfCards is ready!"
 window.deckOfCards = deckOfCards
-window.obj = obj
 window.$tk = $tk
